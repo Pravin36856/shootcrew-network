@@ -451,7 +451,7 @@ export default function AdminPanel({
                 required
                 value={upiInput}
                 onChange={(e) => setUpiInput(e.target.value)}
-                placeholder="उदा. 9823000000@ybl ya yourname@okaxis"
+                placeholder="8669173204@hdfc"
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 font-mono"
               />
             </div>
@@ -464,7 +464,7 @@ export default function AdminPanel({
                 type="tel"
                 value={supportPhoneInput}
                 onChange={(e) => setSupportPhoneInput(e.target.value)}
-                placeholder="10 digit support phone"
+                placeholder="8669173204"
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
               />
             </div>

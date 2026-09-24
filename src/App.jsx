@@ -382,7 +382,14 @@ export default function App() {
             Admin & UPI Settings
           </button>
           <span>•</span>
-          <span>Support: +91 {config.supportPhone}</span>
+          <a 
+            href={`https://wa.me/91${config.supportPhone}?text=${encodeURIComponent('Namaste, mujhe PhotographerCrew platform ke baare me jankari chahiye.')}`}
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="hover:text-emerald-400 font-semibold text-slate-300 transition-colors"
+          >
+            Support / WhatsApp: +91 {config.supportPhone}
+          </a>
         </div>
       </footer>
 

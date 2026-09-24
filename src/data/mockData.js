@@ -254,15 +254,15 @@ export const INITIAL_PLATFORM_CONFIG = {
   tagline: 'Gondia & Nagpur Photography Crew & Cameraman Network',
   registrationFee: 299, // Platform fee in INR for registering
   directConnectFee: 49,  // Fee per lead or unlimited monthly
-  upiId: 'photographercrew@upi',
-  supportPhone: '9823000000',
-  qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=photographercrew@upi%26pn=PhotographerCrew%26am=299%26cu=INR',
+  upiId: '8669173204@hdfc',
+  supportPhone: '8669173204',
+  qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=8669173204@hdfc%26pn=PhotographerCrew%26am=299%26cu=INR',
 };
 
 // Storage helper functions
 export const getStoredCrew = () => {
   try {
-    const data = localStorage.getItem('shootcrew_crew_data');
+    const data = localStorage.getItem('photographercrew_crew_data') || localStorage.getItem('shootcrew_crew_data');
     if (data) {
       return JSON.parse(data);
     }
@@ -274,7 +274,7 @@ export const getStoredCrew = () => {
 
 export const saveCrewData = (crewList) => {
   try {
-    localStorage.setItem('shootcrew_crew_data', JSON.stringify(crewList));
+    localStorage.setItem('photographercrew_crew_data', JSON.stringify(crewList));
   } catch (e) {
     console.error('Failed to save crew data', e);
   }
@@ -282,9 +282,17 @@ export const saveCrewData = (crewList) => {
 
 export const getPlatformConfig = () => {
   try {
-    const data = localStorage.getItem('shootcrew_config');
+    const data = localStorage.getItem('photographercrew_config') || localStorage.getItem('shootcrew_config');
     if (data) {
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      // Auto-migrate to official user UPI ID and Support Phone if old placeholder exists
+      if (parsed.upiId === 'shootcrew@upi' || parsed.upiId === 'photographercrew@upi' || !parsed.supportPhone || parsed.supportPhone === '9823000000') {
+        parsed.upiId = '8669173204@hdfc';
+        parsed.supportPhone = '8669173204';
+        parsed.qrCodeUrl = INITIAL_PLATFORM_CONFIG.qrCodeUrl;
+        localStorage.setItem('photographercrew_config', JSON.stringify(parsed));
+      }
+      return parsed;
     }
   } catch (e) {
     console.error('Failed to load platform config', e);
@@ -294,7 +302,7 @@ export const getPlatformConfig = () => {
 
 export const savePlatformConfig = (cfg) => {
   try {
-    localStorage.setItem('shootcrew_config', JSON.stringify(cfg));
+    localStorage.setItem('photographercrew_config', JSON.stringify(cfg));
   } catch (e) {
     console.error('Failed to save config', e);
   }
