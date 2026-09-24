@@ -41,12 +41,14 @@ export default function SearchFilters({
   setSelectedRole,
   selectedGearType,
   setSelectedGearType,
+  selectedSpecialGear,
+  setSelectedSpecialGear,
   searchQuery,
   setSearchQuery,
   totalResults,
   onResetFilters
 }) {
-  const isFiltered = selectedCity !== 'all' || selectedDate !== '' || selectedRole !== 'all' || selectedGearType !== 'all' || searchQuery !== '';
+  const isFiltered = selectedCity !== 'all' || selectedDate !== '' || selectedRole !== 'all' || selectedGearType !== 'all' || (selectedSpecialGear && selectedSpecialGear !== 'all') || searchQuery !== '';
 
   return (
     <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl shadow-slate-950/50 space-y-5">
@@ -201,6 +203,65 @@ export default function SearchFilters({
             <span>Without Camera (सिर्फ ऑपरेटर / एक्सपोजिंग) 👤</span>
           </button>
         </div>
+
+        {/* Quick Equipment Filters (Drone, Gimbal, 2+ Cameras) */}
+        {selectedGearType !== 'without_gear' && (
+          <div className="flex flex-wrap items-center gap-2 pt-3">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              Specific Equipment Need:
+            </span>
+            <button
+              type="button"
+              onClick={() => setSelectedSpecialGear && setSelectedSpecialGear('all')}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all ${
+                (!selectedSpecialGear || selectedSpecialGear === 'all')
+                  ? 'bg-slate-800 text-white border-slate-600'
+                  : 'bg-slate-950 text-slate-400 border-slate-850 hover:text-slate-200'
+              }`}
+            >
+              Any Setup
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedSpecialGear && setSelectedSpecialGear(selectedSpecialGear === 'drone' ? 'all' : 'drone')}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all flex items-center gap-1.5 ${
+                selectedSpecialGear === 'drone'
+                  ? 'bg-sky-500/20 text-sky-300 border-sky-400 font-bold ring-1 ring-sky-400'
+                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
+              }`}
+            >
+              <Plane className="w-3.5 h-3.5 text-sky-400" />
+              <span>Drone Needed (ड्रोन वाले लड़के) 🚁</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedSpecialGear && setSelectedSpecialGear(selectedSpecialGear === 'gimbal' ? 'all' : 'gimbal')}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all flex items-center gap-1.5 ${
+                selectedSpecialGear === 'gimbal'
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400 font-bold ring-1 ring-emerald-400'
+                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
+              }`}
+            >
+              <Camera className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Gimbal Operator (गिम्बल सेटअप) 🎯</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedSpecialGear && setSelectedSpecialGear(selectedSpecialGear === 'multi_cam' ? 'all' : 'multi_cam')}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all flex items-center gap-1.5 ${
+                selectedSpecialGear === 'multi_cam'
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-400 font-bold ring-1 ring-amber-400'
+                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
+              }`}
+            >
+              <Camera className="w-3.5 h-3.5 text-amber-400" />
+              <span>Multi-Camera (2+ कैमरे) 📷</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Row 3: Role / Category Chips */}

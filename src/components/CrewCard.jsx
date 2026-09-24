@@ -8,15 +8,23 @@ import {
   MessageSquare, 
   ShieldCheck, 
   Check, 
-  Briefcase, 
-  Tag, 
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  Sliders,
+  Plane,
+  Eye,
+  Layers,
+  Wrench
 } from 'lucide-react';
 
-export default function CrewCard({ crew, onBook, onViewDates, selectedDate }) {
+export default function CrewCard({ crew, onBook, onViewDates, onViewGearKit, selectedDate }) {
   const datesList = Array.isArray(crew?.availableDates) ? crew.availableDates : [];
   const isAvailableOnSelectedDate = selectedDate ? datesList.includes(selectedDate) : null;
+  const kit = crew?.gearKit || {};
+  const cameras = Array.isArray(kit.cameras) ? kit.cameras : [];
+  const totalCameras = kit.totalCameras !== undefined 
+    ? kit.totalCameras 
+    : (cameras.reduce((acc, c) => acc + (c.qty || 1), 0) || (crew.hasCamera ? 1 : 0));
 
   // Format WhatsApp Link
   const waText = encodeURIComponent(
@@ -86,13 +94,13 @@ export default function CrewCard({ crew, onBook, onViewDates, selectedDate }) {
         </div>
 
         {/* Camera Gear Status Box */}
-        <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3 space-y-1.5">
+        <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3 space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="text-slate-400 font-semibold flex items-center gap-1.5">
               {crew.hasCamera ? (
                 <>
                   <Camera className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="text-amber-300 font-bold">Camera ke Sath (With Gear):</span>
+                  <span className="text-amber-300 font-bold">Camera Setup ({totalCameras} Body):</span>
                 </>
               ) : (
                 <>
@@ -101,13 +109,45 @@ export default function CrewCard({ crew, onBook, onViewDates, selectedDate }) {
                 </>
               )}
             </span>
-            <span className="text-[11px] font-mono font-bold text-slate-300">
-              {crew.hasCamera ? 'GEAR INCLUDED' : 'OPERATOR ONLY'}
-            </span>
+
+            {/* View Full Gear Kit link */}
+            <button
+              type="button"
+              onClick={() => onViewGearKit(crew)}
+              className="text-[11px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 hover:underline cursor-pointer"
+            >
+              <Eye className="w-3 h-3" />
+              <span>Full Gear Details</span>
+            </button>
           </div>
+
           <p className="text-xs text-slate-300 font-medium leading-relaxed">
             {crew.cameraDetails}
           </p>
+
+          {/* Quick Equipment Tags (Camera count, Gimbal, Drone) */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            {crew.hasCamera && totalCameras > 0 && (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                <Camera className="w-3 h-3" />
+                <span>{totalCameras} Camera{totalCameras > 1 ? 's' : ''}</span>
+              </span>
+            )}
+
+            {(kit.hasGimbal || kit.gimbal || crew.cameraDetails.toLowerCase().includes('gimbal')) && (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                <Sliders className="w-3 h-3" />
+                <span>Gimbal ✅</span>
+              </span>
+            )}
+
+            {(kit.hasDrone || kit.drone || crew.role === 'drone_operator' || crew.cameraDetails.toLowerCase().includes('mavic') || crew.cameraDetails.toLowerCase().includes('drone')) && (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-300 border border-sky-500/30 flex items-center gap-1">
+                <Plane className="w-3 h-3" />
+                <span>Drone 🚁</span>
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Bio / Work summary */}
@@ -125,7 +165,7 @@ export default function CrewCard({ crew, onBook, onViewDates, selectedDate }) {
                 With Camera Rate
               </span>
               <span className="text-sm font-bold text-amber-400">
-                ₹{crew.rateWithGear.toLocaleString('en-IN')}{' '}
+                ₹{Number(crew.rateWithGear).toLocaleString('en-IN')}{' '}
                 <span className="text-[10px] text-slate-500 font-normal">/ day</span>
               </span>
             </div>
@@ -144,7 +184,7 @@ export default function CrewCard({ crew, onBook, onViewDates, selectedDate }) {
                 Without Camera (Exposing)
               </span>
               <span className="text-sm font-bold text-emerald-400">
-                ₹{crew.rateWithoutGear.toLocaleString('en-IN')}{' '}
+                ₹{Number(crew.rateWithoutGear).toLocaleString('en-IN')}{' '}
                 <span className="text-[10px] text-slate-500 font-normal">/ day</span>
               </span>
             </div>
@@ -209,10 +249,20 @@ export default function CrewCard({ crew, onBook, onViewDates, selectedDate }) {
         {/* Book Now Button */}
         <button
           onClick={() => onBook(crew)}
-          className="col-span-6 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs sm:text-sm shadow-md shadow-amber-500/20 transition-all active:scale-[0.98]"
+          className="col-span-4 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 transition-all active:scale-[0.98]"
         >
           <Calendar className="w-3.5 h-3.5 text-slate-950" />
           <span>Book Crew</span>
+        </button>
+
+        {/* View Gear Kit Button */}
+        <button
+          onClick={() => onViewGearKit(crew)}
+          className="col-span-3 flex items-center justify-center gap-1 py-2.5 px-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold text-[11px] transition-colors"
+          title="View Gear Kit"
+        >
+          <Wrench className="w-3.5 h-3.5 text-amber-400" />
+          <span>Gear Kit</span>
         </button>
 
         {/* Direct WhatsApp Action */}
@@ -220,7 +270,7 @@ export default function CrewCard({ crew, onBook, onViewDates, selectedDate }) {
           href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="col-span-4 flex items-center justify-center gap-1 py-2.5 px-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 font-bold text-xs transition-colors"
+          className="col-span-3 flex items-center justify-center gap-1 py-2.5 px-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 font-bold text-xs transition-colors"
           title="Direct WhatsApp"
         >
           <MessageSquare className="w-3.5 h-3.5" />

@@ -15,10 +15,26 @@ import {
   Copy,
   Check,
   Plus,
-  Trash2
+  Trash2,
+  Minus,
+  Sliders,
+  Plane,
+  Layers,
+  Sun,
+  Mic,
+  BatteryCharging
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { ROLES, CITIES } from '../data/mockData';
+import { 
+  ROLES, 
+  CITIES, 
+  COMMON_CAMERAS, 
+  COMMON_GIMBALS, 
+  COMMON_DRONES, 
+  COMMON_LENSES, 
+  COMMON_LIGHTS, 
+  COMMON_MICS 
+} from '../data/mockData';
 
 export default function CrewRegistrationModal({ onClose, onRegisterSuccess, config }) {
   const [step, setStep] = useState(1);
@@ -35,9 +51,45 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
   const [instagram, setInstagram] = useState('');
   const [bio, setBio] = useState('');
 
-  // Gear & Rates
+  // Equipment & Kit State
   const [hasCamera, setHasCamera] = useState(true);
-  const [cameraDetails, setCameraDetails] = useState('');
+  
+  // Camera bodies list: [{ model: 'Sony A7 IV', qty: 1 }]
+  const [camerasList, setCamerasList] = useState([
+    { model: 'Sony A7 IV', qty: 1 }
+  ]);
+  const [newCamSelect, setNewCamSelect] = useState(COMMON_CAMERAS[0]);
+  const [newCamQty, setNewCamQty] = useState(1);
+  const [customCamInput, setCustomCamInput] = useState('');
+
+  // Gimbal
+  const [hasGimbal, setHasGimbal] = useState(false);
+  const [gimbalModel, setGimbalModel] = useState(COMMON_GIMBALS[0]);
+
+  // Drone
+  const [hasDrone, setHasDrone] = useState(false);
+  const [droneModel, setDroneModel] = useState(COMMON_DRONES[0]);
+  const [droneBatteries, setDroneBatteries] = useState(3);
+
+  // Lenses, Lights, Mics
+  const [selectedLenses, setSelectedLenses] = useState([
+    '24-70mm f/2.8 (Stage & Vidhi Zoom)',
+    '50mm f/1.2 / f/1.4 (Portraits)'
+  ]);
+  const [selectedLights, setSelectedLights] = useState([
+    'Godox V1 On-Camera Round Flash'
+  ]);
+  const [selectedMics, setSelectedMics] = useState([
+    'DJI Mic 2 Wireless'
+  ]);
+
+  // If without camera: which cameras they operate
+  const [operatedCameras, setOperatedCameras] = useState([
+    'Sony FX30 Cinema',
+    'Panasonic CX350 (4K Camcorder)'
+  ]);
+
+  // Rates
   const [rateWithGear, setRateWithGear] = useState('2500');
   const [withoutGearAvailable, setWithoutGearAvailable] = useState(true);
   const [rateWithoutGear, setRateWithoutGear] = useState('1200');
@@ -61,6 +113,46 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
 
   const selectedRoleObj = ROLES.find(r => r.id === role) || ROLES[1];
   const selectedCityObj = CITIES.find(c => c.id === city) || CITIES[0];
+
+  // Camera Management Handlers
+  const handleAddCamera = () => {
+    const modelToAdd = customCamInput.trim() !== '' ? customCamInput.trim() : newCamSelect;
+    if (!modelToAdd) return;
+    
+    // Check if already in list
+    const existingIndex = camerasList.findIndex(c => c.model.toLowerCase() === modelToAdd.toLowerCase());
+    if (existingIndex > -1) {
+      const updated = [...camerasList];
+      updated[existingIndex].qty += Number(newCamQty);
+      setCamerasList(updated);
+    } else {
+      setCamerasList([...camerasList, { model: modelToAdd, qty: Number(newCamQty) }]);
+    }
+    setCustomCamInput('');
+    setNewCamQty(1);
+  };
+
+  const handleRemoveCamera = (index) => {
+    setCamerasList(camerasList.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateCameraQty = (index, delta) => {
+    const updated = [...camerasList];
+    const newQ = (updated[index].qty || 1) + delta;
+    if (newQ > 0) {
+      updated[index].qty = newQ;
+      setCamerasList(updated);
+    }
+  };
+
+  // Toggle helper for multi-select chips
+  const toggleItem = (list, setList, item) => {
+    if (list.includes(item)) {
+      setList(list.filter(x => x !== item));
+    } else {
+      setList([...list, item]);
+    }
+  };
 
   const handleCopyUpi = () => {
     navigator.clipboard.writeText(config.upiId);
@@ -110,6 +202,39 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
       ? `${customVillage}, ${selectedCityObj.name}` 
       : (area ? `${area}, ${selectedCityObj.name}` : selectedCityObj.name);
 
+    // Calculate total camera bodies count
+    const totalCameras = hasCamera 
+      ? camerasList.reduce((acc, c) => acc + (c.qty || 1), 0)
+      : 0;
+
+    // Generate descriptive summary for card view
+    let gearSummary = '';
+    if (hasCamera) {
+      const camStrings = camerasList.map(c => `${c.qty}x ${c.model}`);
+      const parts = [];
+      if (camStrings.length > 0) parts.push(camStrings.join(' + '));
+      if (hasGimbal) parts.push(gimbalModel);
+      if (hasDrone) parts.push(`${droneModel} (${droneBatteries} Batt)`);
+      if (selectedLights.length > 0) parts.push(selectedLights[0].split(' ')[0] + ' ' + selectedLights[0].split(' ')[1]);
+      gearSummary = parts.join(' • ');
+    } else {
+      gearSummary = `Operator Only (Expert on ${operatedCameras.slice(0, 3).join(', ')})`;
+    }
+
+    const gearKit = {
+      cameras: hasCamera ? camerasList : [],
+      totalCameras: totalCameras,
+      hasGimbal: hasGimbal,
+      gimbal: hasGimbal ? gimbalModel : null,
+      hasDrone: hasDrone,
+      drone: hasDrone ? droneModel : null,
+      droneBatteries: hasDrone ? droneBatteries : 0,
+      lenses: selectedLenses,
+      lighting: selectedLights.join(' • '),
+      mic: selectedMics.join(' • '),
+      operatedCameras: !hasCamera ? operatedCameras : [],
+    };
+
     const newCrew = {
       id: `crew-${Date.now()}`,
       name: name,
@@ -122,9 +247,8 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
       experience: experience,
       hasCamera: hasCamera,
       gearType: hasCamera ? 'with_gear' : 'without_gear',
-      cameraDetails: hasCamera 
-        ? (cameraDetails || 'Sony/Canon DSLR/Mirrorless Setup') 
-        : (cameraDetails || 'Operator Only (Exposing Specialist)'),
+      cameraDetails: gearSummary,
+      gearKit: gearKit,
       withoutGearAvailable: withoutGearAvailable || !hasCamera,
       rateWithGear: hasCamera ? parseInt(rateWithGear, 10) || 2500 : null,
       rateWithoutGear: parseInt(rateWithoutGear, 10) || 1200,
@@ -132,11 +256,11 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
       reviewsCount: 1,
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=80',
       availableDates: availableDates,
-      isVerified: true, // auto-verified for demonstration or pending
+      isVerified: true,
       registrationPaid: true,
       paymentUtr: paymentUtr,
       instagram: instagram || '@photographercrew_member',
-      bio: bio || `${selectedRoleObj.label} available in ${selectedCityObj.name} for wedding shoots.`,
+      bio: bio || `${selectedRoleObj.label} in ${selectedCityObj.name} with ${totalCameras} Camera(s)${hasGimbal ? ' + Gimbal' : ''}${hasDrone ? ' + Drone' : ''}.`,
     };
 
     setTimeout(() => {
@@ -167,7 +291,7 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
               </h3>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              अपनी सिटी में काम पाने के लिए रजिस्टर करें और खाली तारीखें डालें
+              कैमरे, गिम्बल, ड्रोन और खाली तारीखें दर्ज करें
             </p>
           </div>
 
@@ -199,7 +323,7 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                 Badhai Ho! Registration Successful 🎉
               </h4>
               <p className="text-sm text-slate-300 max-w-md mx-auto">
-                आपकी प्रोफाइल <strong>PhotographerCrew Network</strong> पर लाइव हो गई है। अब {selectedCityObj.name} और आसपास के सभी स्टूडियो वाले आपको खाली तारीखों पर डायरेक्ट बुक कर सकेंगे!
+                आपकी प्रोफाइल <strong>PhotographerCrew Network</strong> पर लाइव हो गई है। आपके सभी कैमरे, गिम्बल और ड्रोन स्टूडियोज को दिखेंगे!
               </p>
             </div>
 
@@ -213,16 +337,18 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                 <span className="font-bold text-amber-400">{selectedRoleObj.label}</span>
               </div>
               <div className="flex justify-between text-slate-400">
+                <span>Equipment Setup:</span>
+                <span className="font-bold text-emerald-400">
+                  {hasCamera ? `${camerasList.reduce((acc, c) => acc + (c.qty || 1), 0)} Camera(s)${hasGimbal ? ' + Gimbal' : ''}${hasDrone ? ' + Drone' : ''}` : 'Operator Only'}
+                </span>
+              </div>
+              <div className="flex justify-between text-slate-400">
                 <span>City / Area:</span>
                 <span className="font-bold text-white">{customVillage || area || selectedCityObj.name}</span>
               </div>
               <div className="flex justify-between text-slate-400">
                 <span>Khali Dates Added:</span>
                 <span className="font-bold text-emerald-400">{availableDates.length} Dates</span>
-              </div>
-              <div className="flex justify-between text-slate-400">
-                <span>Registration Fee:</span>
-                <span className="font-bold text-emerald-400">₹{config.registrationFee} Paid (Verified)</span>
               </div>
             </div>
 
@@ -347,35 +473,35 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                     onClick={() => setStep(2)}
                     className="flex items-center gap-2 py-3 px-6 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold text-sm shadow-md"
                   >
-                    <span>Next: Role & Gear (आगे बढ़ें)</span>
+                    <span>Next: Equipment Kit (कैमरे, गिम्बल, ड्रोन)</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             )}
 
-            {/* STEP 2: Role, Gear & Rates */}
+            {/* STEP 2: Complete Gear & Equipment Builder */}
             {step === 2 && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div className="bg-amber-500/10 border border-amber-500/20 p-3.5 rounded-2xl flex items-center gap-3">
                   <Sparkles className="w-5 h-5 text-amber-400 shrink-0" />
                   <p className="text-xs text-amber-300">
-                    Step 2: आप क्या काम करते हैं और कैमरे के साथ या बिना कैमरे काम करते हैं?
+                    Step 2: आपके पास कौन-कौन से कैमरे, कितने कैमरे, गिम्बल और ड्रोन हैं? सब जोड़ें।
                   </p>
                 </div>
 
-                {/* Role Selection */}
+                {/* Primary Role Selection */}
                 <div>
                   <label className="block text-xs font-bold text-slate-300 uppercase mb-2">
                     Primary Role / Specialization (आपका काम) *
                   </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {ROLES.filter(r => r.id !== 'all').map((r) => (
                       <button
                         key={r.id}
                         type="button"
                         onClick={() => setRole(r.id)}
-                        className={`p-3 rounded-xl border text-left transition-all ${
+                        className={`p-2.5 rounded-xl border text-left transition-all ${
                           role === r.id
                             ? 'bg-amber-500/20 border-amber-500 text-white font-bold ring-1 ring-amber-500'
                             : 'border-slate-800 bg-slate-950 hover:border-slate-700 text-slate-300 text-xs'
@@ -391,7 +517,7 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                 {/* Camera Equipment Toggle */}
                 <div className="border-t border-slate-800 pt-3">
                   <label className="block text-xs font-bold text-slate-300 uppercase mb-2">
-                    Do you have Camera / Equipment? (क्या आपके पास कैमरा है?)
+                    Do you have Camera Equipment? (क्या आपके पास कैमरा है?)
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
@@ -403,7 +529,7 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                           : 'bg-slate-950 border-slate-800 text-slate-400'
                       }`}
                     >
-                      📸 Yes, With Camera (कैमरे के साथ)
+                      📸 Yes, With Camera & Gear (कैमरे के साथ)
                     </button>
 
                     <button
@@ -420,19 +546,334 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                   </div>
                 </div>
 
-                {/* Camera Details */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5">
-                    {hasCamera ? 'Your Camera & Lens Details (कैमरा मॉडल व लेंस)' : 'Known Cameras you can operate (जिन कैमरों पर हाथ साफ है)'}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder={hasCamera ? "उदा. Sony A7 IV + 24-70 GM II + V1 Flash ya DJI Mavic 3" : "उदा. Sony FX3, FX30, Panasonic CX350, Nikon Z6"}
-                    value={cameraDetails}
-                    onChange={(e) => setCameraDetails(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
-                  />
-                </div>
+                {hasCamera ? (
+                  <div className="space-y-4 bg-slate-950/80 p-4 sm:p-5 rounded-2xl border border-slate-800">
+                    
+                    {/* 1. CAMERA BODIES & QUANTITIES (कौन-कौन से कैमरे और कितने कैमरे हैं) */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                          <Camera className="w-4 h-4 text-amber-400" />
+                          <span>1. Camera Bodies & Count (कैमरे और संख्या)</span>
+                        </label>
+                        <span className="text-[11px] font-bold text-slate-300">
+                          Total: {camerasList.reduce((acc, c) => acc + (c.qty || 1), 0)} Camera Body
+                        </span>
+                      </div>
+
+                      {/* Added cameras list */}
+                      <div className="space-y-2">
+                        {camerasList.map((cam, idx) => (
+                          <div 
+                            key={idx}
+                            className="flex items-center justify-between p-2.5 bg-slate-900 border border-slate-800 rounded-xl"
+                          >
+                            <span className="text-xs font-bold text-white">
+                              📷 {cam.model}
+                            </span>
+
+                            <div className="flex items-center gap-2">
+                              {/* Quantity counter */}
+                              <div className="flex items-center gap-1.5 bg-slate-950 border border-slate-800 px-2 py-1 rounded-lg">
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateCameraQty(idx, -1)}
+                                  className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-white bg-slate-800 rounded"
+                                >
+                                  <Minus className="w-3 h-3" />
+                                </button>
+                                <span className="text-xs font-mono font-bold text-amber-400 px-1">
+                                  {cam.qty} Qty
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateCameraQty(idx, 1)}
+                                  className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-white bg-slate-800 rounded"
+                                >
+                                  <Plus className="w-3 h-3" />
+                                </button>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveCamera(idx)}
+                                className="p-1.5 text-slate-500 hover:text-rose-400"
+                                title="Remove camera"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Add new camera selector row */}
+                      <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 pt-1 border-t border-slate-900">
+                        <div className="sm:col-span-7">
+                          <select
+                            value={newCamSelect}
+                            onChange={(e) => setNewCamSelect(e.target.value)}
+                            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                          >
+                            {COMMON_CAMERAS.map((c) => (
+                              <option key={c} value={c}>{c}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <select
+                            value={newCamQty}
+                            onChange={(e) => setNewCamQty(Number(e.target.value))}
+                            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-bold"
+                          >
+                            <option value={1}>1 Qty</option>
+                            <option value={2}>2 Qty</option>
+                            <option value={3}>3 Qty</option>
+                            <option value={4}>4 Qty</option>
+                          </select>
+                        </div>
+
+                        <div className="sm:col-span-3">
+                          <button
+                            type="button"
+                            onClick={handleAddCamera}
+                            className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition-colors"
+                          >
+                            <Plus className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Add Camera</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Custom camera name input if not in list */}
+                      <div className="flex items-center gap-2 pt-1">
+                        <input
+                          type="text"
+                          placeholder="Or type other camera model (उदा. Sony A7C, Fuji X-T5...)"
+                          value={customCamInput}
+                          onChange={(e) => setCustomCamInput(e.target.value)}
+                          className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                        />
+                        {customCamInput && (
+                          <button
+                            type="button"
+                            onClick={handleAddCamera}
+                            className="py-1.5 px-3 rounded-lg bg-amber-500 text-slate-950 font-bold text-xs"
+                          >
+                            Add
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 2. GIMBAL SETUP (क्या गिम्बल है?) */}
+                    <div className="pt-3 border-t border-slate-800/80 space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-bold text-slate-300 uppercase flex items-center gap-1.5">
+                          <Sliders className="w-4 h-4 text-emerald-400" />
+                          <span>2. Gimbal Stabilizer (क्या आपके पास गिम्बल है?)</span>
+                        </label>
+
+                        <button
+                          type="button"
+                          onClick={() => setHasGimbal(!hasGimbal)}
+                          className={`text-xs font-bold px-3 py-1 rounded-full transition-all border ${
+                            hasGimbal 
+                              ? 'bg-emerald-500 text-slate-950 border-emerald-400' 
+                              : 'bg-slate-900 text-slate-400 border-slate-800'
+                          }`}
+                        >
+                          {hasGimbal ? 'Yes, Gimbal Included ✅' : 'No Gimbal'}
+                        </button>
+                      </div>
+
+                      {hasGimbal && (
+                        <div className="p-3 bg-slate-900 rounded-xl border border-emerald-500/30">
+                          <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                            Select Gimbal Model:
+                          </label>
+                          <select
+                            value={gimbalModel}
+                            onChange={(e) => setGimbalModel(e.target.value)}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                          >
+                            {COMMON_GIMBALS.map((g) => (
+                              <option key={g} value={g}>{g}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 3. DRONE SETUP (क्या ड्रोन है?) */}
+                    <div className="pt-3 border-t border-slate-800/80 space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-bold text-slate-300 uppercase flex items-center gap-1.5">
+                          <Plane className="w-4 h-4 text-sky-400" />
+                          <span>3. Drone Setup (क्या आपके पास ड्रोन है?)</span>
+                        </label>
+
+                        <button
+                          type="button"
+                          onClick={() => setHasDrone(!hasDrone)}
+                          className={`text-xs font-bold px-3 py-1 rounded-full transition-all border ${
+                            hasDrone 
+                              ? 'bg-sky-500 text-slate-950 border-sky-400' 
+                              : 'bg-slate-900 text-slate-400 border-slate-800'
+                          }`}
+                        >
+                          {hasDrone ? 'Yes, Drone Included 🚁' : 'No Drone'}
+                        </button>
+                      </div>
+
+                      {hasDrone && (
+                        <div className="p-3 bg-slate-900 rounded-xl border border-sky-500/30 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          <div className="sm:col-span-2">
+                            <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                              Select Drone Model:
+                            </label>
+                            <select
+                              value={droneModel}
+                              onChange={(e) => setDroneModel(e.target.value)}
+                              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500"
+                            >
+                              {COMMON_DRONES.map((d) => (
+                                <option key={d} value={d}>{d}</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-400 mb-1 flex items-center gap-1">
+                              <BatteryCharging className="w-3 h-3 text-sky-400" />
+                              <span>Batteries:</span>
+                            </label>
+                            <select
+                              value={droneBatteries}
+                              onChange={(e) => setDroneBatteries(Number(e.target.value))}
+                              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500 font-bold"
+                            >
+                              <option value={2}>2 Batteries</option>
+                              <option value={3}>3 Batteries</option>
+                              <option value={4}>4 Batteries</option>
+                              <option value={5}>5+ Batteries</option>
+                            </select>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 4. LENSES CHIPS */}
+                    <div className="pt-3 border-t border-slate-800/80 space-y-2">
+                      <label className="block text-xs font-bold text-slate-300 uppercase flex items-center gap-1.5">
+                        <Layers className="w-4 h-4 text-amber-400" />
+                        <span>4. Lenses Available (लेंस चुनें)</span>
+                      </label>
+                      <div className="flex flex-wrap gap-1.5">
+                        {COMMON_LENSES.map((lens) => {
+                          const isSelected = selectedLenses.includes(lens);
+                          return (
+                            <button
+                              key={lens}
+                              type="button"
+                              onClick={() => toggleItem(selectedLenses, setSelectedLenses, lens)}
+                              className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all border ${
+                                isSelected
+                                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
+                              }`}
+                            >
+                              {isSelected ? '✓ ' : '+ '}{lens}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* 5. LIGHTING & MICS */}
+                    <div className="pt-3 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5 flex items-center gap-1">
+                          <Sun className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Lighting / Flashes</span>
+                        </label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {COMMON_LIGHTS.slice(0, 4).map((light) => {
+                            const isSelected = selectedLights.includes(light);
+                            return (
+                              <button
+                                key={light}
+                                type="button"
+                                onClick={() => toggleItem(selectedLights, setSelectedLights, light)}
+                                className={`px-2 py-1 rounded-lg text-[10px] font-medium border ${
+                                  isSelected
+                                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                                    : 'bg-slate-900 text-slate-400 border-slate-800'
+                                }`}
+                              >
+                                {isSelected ? '✓ ' : '+ '}{light.split(' ')[0]} {light.split(' ')[1]}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5 flex items-center gap-1">
+                          <Mic className="w-3.5 h-3.5 text-purple-400" />
+                          <span>Wireless Microphones</span>
+                        </label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {COMMON_MICS.map((mic) => {
+                            const isSelected = selectedMics.includes(mic);
+                            return (
+                              <button
+                                key={mic}
+                                type="button"
+                                onClick={() => toggleItem(selectedMics, setSelectedMics, mic)}
+                                className={`px-2 py-1 rounded-lg text-[10px] font-medium border ${
+                                  isSelected
+                                    ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                                    : 'bg-slate-900 text-slate-400 border-slate-800'
+                                }`}
+                              >
+                                {isSelected ? '✓ ' : '+ '}{mic}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                ) : (
+                  /* OPERATOR ONLY (WITHOUT CAMERA) SELECTION */
+                  <div className="p-4 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <label className="block text-xs font-bold text-slate-300 uppercase">
+                      Select Cameras you can operate without issue (जिन कैमरों को आप चला सकते हैं):
+                    </label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {COMMON_CAMERAS.map((cam) => {
+                        const isSelected = operatedCameras.includes(cam);
+                        return (
+                          <button
+                            key={cam}
+                            type="button"
+                            onClick={() => toggleItem(operatedCameras, setOperatedCameras, cam)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold border ${
+                              isSelected
+                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                                : 'bg-slate-900 text-slate-400 border-slate-800'
+                            }`}
+                          >
+                            {isSelected ? '✓ ' : '+ '}{cam}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 {/* Rates Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800 pt-3">
@@ -448,7 +889,7 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                           placeholder="2500"
                           value={rateWithGear}
                           onChange={(e) => setRateWithGear(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
+                          className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 font-bold"
                         />
                       </div>
                     </div>
@@ -465,7 +906,7 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                         placeholder="1200"
                         value={rateWithoutGear}
                         onChange={(e) => setRateWithoutGear(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 font-bold"
                       />
                     </div>
                   </div>
@@ -594,7 +1035,7 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
               </div>
             )}
 
-            {/* STEP 4: Registration Fee & Payment (Application Owner Revenue) */}
+            {/* STEP 4: Registration Fee & Payment */}
             {step === 4 && (
               <div className="space-y-4">
                 <div className="bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-transparent border border-amber-500/30 p-4 rounded-2xl">
@@ -641,14 +1082,14 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                           onClick={handleCopyUpi}
                           className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs flex items-center gap-1"
                         >
-                          {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                          {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
                           <span>{copiedUpi ? 'Copied' : 'Copy'}</span>
                         </button>
                       </div>
                     </div>
 
                     <div className="text-[11px] text-slate-400">
-                      Amount to Pay: <strong className="text-white">₹{config.registrationFee}</strong> • Platform Owner Account
+                      Amount to Pay: <strong className="text-white">₹{config.registrationFee}</strong> • Official Platform UPI
                     </div>
                   </div>
                 </div>

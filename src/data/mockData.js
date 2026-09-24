@@ -1,4 +1,4 @@
-// Mock data and storage helpers for ShootCrew (Cameraman & Crew Booking Network)
+// Mock data and storage helpers for PhotographerCrew (Cameraman & Crew Booking Network)
 
 export const ROLES = [
   { id: 'all', label: 'All Roles (सभी)', labelHi: 'सभी काम', icon: 'Sparkles' },
@@ -21,6 +21,70 @@ export const CITIES = [
   { id: 'chandrapur', name: 'Chandrapur (चंद्रपुर)', state: 'Maharashtra', areas: ['Gandhi Chowk', 'Civil Lines', 'Ballarpur'] },
 ];
 
+// Presets for Equipment Management
+export const COMMON_CAMERAS = [
+  'Sony A7 IV',
+  'Sony A7 III',
+  'Sony FX3 Cinema',
+  'Sony FX30 Cinema',
+  'Sony A7R V',
+  'Canon EOS R6 Mark II',
+  'Canon EOS R5',
+  'Canon EOS R8',
+  'Nikon Z6 II',
+  'Nikon Z8',
+  'Panasonic Lumix S5 II',
+  'Panasonic CX350 (4K Camcorder)',
+  'Sony NX200 (HD/4K Camcorder)',
+  'iPhone 15/16 Pro Max',
+];
+
+export const COMMON_GIMBALS = [
+  'DJI RS3 Pro',
+  'DJI RS4 Pro',
+  'DJI RS3 Mini',
+  'DJI Ronin SC',
+  'Zhiyun Crane 4',
+  'Zhiyun Crane 3S',
+  'Zhiyun Weebill 3S',
+  'Moza Air 2S',
+];
+
+export const COMMON_DRONES = [
+  'DJI Mavic 3 Pro (Triple Lens)',
+  'DJI Mavic 3 Classic',
+  'DJI Air 3 (Dual Camera)',
+  'DJI Air 2S',
+  'DJI Mini 4 Pro',
+  'DJI Avata 2 (FPV Baarat Entry)',
+];
+
+export const COMMON_LENSES = [
+  '24-70mm f/2.8 (Stage & Vidhi Zoom)',
+  '70-200mm f/2.8 (Candid Closeups)',
+  '16-35mm f/2.8 (Wide Stage / Hall)',
+  '50mm f/1.2 / f/1.4 (Portraits)',
+  '85mm f/1.4 (Bridal Beauty)',
+  '35mm f/1.4 (Haldi & Candids)',
+  '24-105mm f/4 (All Rounder)',
+];
+
+export const COMMON_LIGHTS = [
+  'Godox V1 On-Camera Round Flash',
+  'Godox AD200 Pro Strobe Light',
+  'Godox AD600 Pro Outdoor Flash',
+  'Simpex 100W Video LED + Stand',
+  'Aputure Amaran 200d LED + Softbox',
+  'RGB Tube Lights (Nanlite / Godox)',
+];
+
+export const COMMON_MICS = [
+  'DJI Mic 2 Wireless',
+  'Rode Wireless GO II Dual',
+  'Sennheiser EW-D Wireless Lapel',
+  'Boya Wireless Mic',
+];
+
 export const INITIAL_CREW = [
   {
     id: 'crew-1',
@@ -32,9 +96,22 @@ export const INITIAL_CREW = [
     role: 'traditional_photo',
     roleLabel: 'Traditional Photographer',
     experience: '6 Years',
-    hasCamera: true, // Camera ke saath
+    hasCamera: true,
     gearType: 'with_gear',
-    cameraDetails: 'Sony A7 IV + 24-70mm GM II + Godox V1 Flash',
+    cameraDetails: '2x Sony A7 IV + 24-70mm GM II + Godox V1 Flash',
+    gearKit: {
+      cameras: [
+        { model: 'Sony A7 IV', qty: 2 }
+      ],
+      totalCameras: 2,
+      hasGimbal: false,
+      gimbal: null,
+      hasDrone: false,
+      drone: null,
+      lenses: ['24-70mm f/2.8 GM II', '70-200mm f/2.8 GM', '50mm f/1.4 GM'],
+      lighting: 'Godox V1 Flash (2x) + Stand',
+      mic: 'Boya Wireless Lapel'
+    },
     withoutGearAvailable: true,
     rateWithGear: 2800,
     rateWithoutGear: 1200,
@@ -59,7 +136,21 @@ export const INITIAL_CREW = [
     experience: '4 Years',
     hasCamera: true,
     gearType: 'with_gear',
-    cameraDetails: 'DJI Mavic 3 Pro (3 Batteries, 4K 60FPS, PolarPro ND Filters)',
+    cameraDetails: 'DJI Mavic 3 Pro (3 Batteries, 4K 60FPS) + Sony A7 III',
+    gearKit: {
+      cameras: [
+        { model: 'Sony A7 III', qty: 1 }
+      ],
+      totalCameras: 1,
+      hasGimbal: true,
+      gimbal: 'DJI RS3 Pro Gimbal',
+      hasDrone: true,
+      drone: 'DJI Mavic 3 Pro (Triple Lens 4K)',
+      droneBatteries: 3,
+      lenses: ['24-70mm f/2.8', 'Drone 24mm/70mm/166mm'],
+      lighting: 'Outdoor LED Searchlight',
+      mic: null
+    },
     withoutGearAvailable: true,
     rateWithGear: 4500,
     rateWithoutGear: 1800,
@@ -84,7 +175,22 @@ export const INITIAL_CREW = [
     experience: '5 Years',
     hasCamera: true,
     gearType: 'with_gear',
-    cameraDetails: 'Sony FX3 + Sony 50mm f/1.2 GM + Ronin RS3 Pro Gimbal',
+    cameraDetails: '1x Sony FX3 + 1x Sony A7 IV + DJI RS3 Pro Gimbal + Drone',
+    gearKit: {
+      cameras: [
+        { model: 'Sony FX3 Cinema', qty: 1 },
+        { model: 'Sony A7 IV', qty: 1 }
+      ],
+      totalCameras: 2,
+      hasGimbal: true,
+      gimbal: 'DJI RS3 Pro + Tilta Follow Focus',
+      hasDrone: true,
+      drone: 'DJI Mini 4 Pro',
+      droneBatteries: 3,
+      lenses: ['Sony 50mm f/1.2 GM', 'Sony 24-70mm f/2.8 GM II', 'Sony 16-35mm f/2.8 GM'],
+      lighting: 'Aputure Amaran 200d LED + Lantern Softbox',
+      mic: 'DJI Mic 2 Wireless (2 Transmitters)'
+    },
     withoutGearAvailable: true,
     rateWithGear: 5500,
     rateWithoutGear: 2200,
@@ -107,9 +213,19 @@ export const INITIAL_CREW = [
     role: 'traditional_video',
     roleLabel: 'Traditional Videographer',
     experience: '8 Years',
-    hasCamera: false, // Without Camera - Exposing / Crew only!
+    hasCamera: false,
     gearType: 'without_gear',
-    cameraDetails: 'Operator Only (Experienced with Sony FX30, Panasonic CX350, Sony NX200, Canon XA50)',
+    cameraDetails: 'Operator Only (Expert on Sony FX30, Panasonic CX350, NX200, Canon XA50)',
+    gearKit: {
+      cameras: [],
+      totalCameras: 0,
+      hasGimbal: true,
+      gimbal: 'Operator on DJI RS3 / Crane',
+      hasDrone: false,
+      drone: null,
+      operatedCameras: ['Sony FX30', 'Panasonic CX350', 'Sony NX200', 'Canon XA50', 'Sony A7M3'],
+      speciality: 'Handheld ritual tracking, Zero camera shake'
+    },
     withoutGearAvailable: true,
     rateWithGear: null,
     rateWithoutGear: 1400,
@@ -134,7 +250,20 @@ export const INITIAL_CREW = [
     experience: '3 Years',
     hasCamera: true,
     gearType: 'with_gear',
-    cameraDetails: 'iPhone 15 Pro Max + DJI Osmo Mobile 6 Gimbal + Rode Wireless Go II',
+    cameraDetails: 'iPhone 15 Pro Max 4K 60FPS + DJI Osmo Mobile 6 Gimbal + Rode Wireless Go II',
+    gearKit: {
+      cameras: [
+        { model: 'iPhone 15 Pro Max (512GB 4K 60FPS)', qty: 1 }
+      ],
+      totalCameras: 1,
+      hasGimbal: true,
+      gimbal: 'DJI Osmo Mobile 6 Gimbal',
+      hasDrone: false,
+      drone: null,
+      lenses: ['Triple Lens 0.5x, 1x, 2x, 5x Macro'],
+      lighting: 'Ulanzi Bi-Color Pocket LED',
+      mic: 'Rode Wireless GO II Dual Channel'
+    },
     withoutGearAvailable: false,
     rateWithGear: 3000,
     rateWithoutGear: 1500,
@@ -159,7 +288,20 @@ export const INITIAL_CREW = [
     experience: '7 Years',
     hasCamera: true,
     gearType: 'with_gear',
-    cameraDetails: 'P3 Outdoor/Indoor LED Cabinet Setup + Novastar Processor + Live Switcher',
+    cameraDetails: 'P3 Outdoor/Indoor LED Cabinet Setup + Novastar Processor + Atem Mini Switcher',
+    gearKit: {
+      cameras: [
+        { model: 'Sony FX30 (Live HDMI Feed)', qty: 1 }
+      ],
+      totalCameras: 1,
+      hasGimbal: false,
+      gimbal: null,
+      hasDrone: false,
+      drone: null,
+      lenses: ['18-105mm G Zoom'],
+      lighting: 'LED Wall Stage Illumination',
+      mic: 'Atem Audio Mixer Inputs'
+    },
     withoutGearAvailable: true,
     rateWithGear: 6500,
     rateWithoutGear: 1500,
@@ -182,9 +324,19 @@ export const INITIAL_CREW = [
     role: 'traditional_photo',
     roleLabel: 'Traditional Photographer',
     experience: '5 Years',
-    hasCamera: false, // Without camera
+    hasCamera: false,
     gearType: 'without_gear',
     cameraDetails: 'Operator Only (Expert on Nikon Z6 II / Z8, Canon R6 & Sony Alpha)',
+    gearKit: {
+      cameras: [],
+      totalCameras: 0,
+      hasGimbal: false,
+      gimbal: null,
+      hasDrone: false,
+      drone: null,
+      operatedCameras: ['Nikon Z6 II', 'Nikon Z8', 'Canon R6 Mark II', 'Sony A7 IV'],
+      speciality: 'Exposing specialist without camera, punctual & quick posing'
+    },
     withoutGearAvailable: true,
     rateWithGear: null,
     rateWithoutGear: 1300,
@@ -209,7 +361,20 @@ export const INITIAL_CREW = [
     experience: '6 Years',
     hasCamera: true,
     gearType: 'with_gear',
-    cameraDetails: 'Sony FX30 4K + 18-105mm G Lens + Simpex LED Light + Heavy Stand',
+    cameraDetails: '2x Sony FX30 Cinema + 18-105mm G Lens + Simpex LED Light + DJI RS3',
+    gearKit: {
+      cameras: [
+        { model: 'Sony FX30 Cinema', qty: 2 }
+      ],
+      totalCameras: 2,
+      hasGimbal: true,
+      gimbal: 'DJI RS3 Gimbal',
+      hasDrone: false,
+      drone: null,
+      lenses: ['18-105mm G OSS', '50mm f/1.8'],
+      lighting: 'Simpex Heavy 100W LED + Stand',
+      mic: 'Sennheiser Wireless Lapel'
+    },
     withoutGearAvailable: true,
     rateWithGear: 3200,
     rateWithoutGear: 1500,
@@ -234,7 +399,19 @@ export const INITIAL_CREW = [
     experience: '3 Years',
     hasCamera: true,
     gearType: 'with_gear',
-    cameraDetails: 'DJI Air 3 Dual Camera (48MP, 70mm telephoto + wide)',
+    cameraDetails: 'DJI Air 3 Dual 4K Camera (4 Batteries, ND Filters) + Fast Charger',
+    gearKit: {
+      cameras: [],
+      totalCameras: 0,
+      hasGimbal: true,
+      gimbal: 'In-built 3-Axis Gimbal',
+      hasDrone: true,
+      drone: 'DJI Air 3 Dual Camera 4K',
+      droneBatteries: 4,
+      lenses: ['Dual 24mm Wide + 70mm Medium Telephoto'],
+      lighting: 'Beacon Lights',
+      mic: null
+    },
     withoutGearAvailable: false,
     rateWithGear: 4000,
     rateWithoutGear: null,
@@ -259,26 +436,30 @@ export const INITIAL_PLATFORM_CONFIG = {
   qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=8669173204@hdfc%26pn=PhotographerCrew%26am=299%26cu=INR',
 };
 
-// Storage helper functions
+// Storage helper functions with complete backward compatibility & automatic gear kit enrichment
 export const getStoredCrew = () => {
   try {
     const data = localStorage.getItem('photographercrew_crew_data') || localStorage.getItem('shootcrew_crew_data');
     if (data) {
       const parsed = JSON.parse(data);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map((c, i) => ({
-          ...(INITIAL_CREW[i % INITIAL_CREW.length] || INITIAL_CREW[0]),
-          ...c,
-          name: c?.name || 'Photographer',
-          phone: c?.phone || '8669173204',
-          area: c?.area || 'Gondia',
-          cityName: c?.cityName || 'Gondia',
-          roleLabel: c?.roleLabel || 'Traditional Photographer',
-          cameraDetails: c?.cameraDetails || 'Standard Gear',
-          availableDates: Array.isArray(c?.availableDates) ? c.availableDates : ['2026-10-15', '2026-11-02', '2026-11-15'],
-          rateWithGear: c?.rateWithGear ? Number(c.rateWithGear) : 2500,
-          rateWithoutGear: c?.rateWithoutGear ? Number(c.rateWithoutGear) : 1200,
-        }));
+        return parsed.map((c, i) => {
+          const fallback = INITIAL_CREW[i % INITIAL_CREW.length] || INITIAL_CREW[0];
+          return {
+            ...fallback,
+            ...c,
+            name: c?.name || fallback.name,
+            phone: c?.phone || fallback.phone,
+            area: c?.area || fallback.area,
+            cityName: c?.cityName || fallback.cityName,
+            roleLabel: c?.roleLabel || fallback.roleLabel,
+            cameraDetails: c?.cameraDetails || fallback.cameraDetails,
+            availableDates: Array.isArray(c?.availableDates) ? c.availableDates : fallback.availableDates,
+            rateWithGear: c?.rateWithGear ? Number(c.rateWithGear) : fallback.rateWithGear,
+            rateWithoutGear: c?.rateWithoutGear ? Number(c.rateWithoutGear) : fallback.rateWithoutGear,
+            gearKit: c?.gearKit || fallback.gearKit,
+          };
+        });
       }
     }
   } catch (e) {
@@ -300,7 +481,6 @@ export const getPlatformConfig = () => {
     const data = localStorage.getItem('photographercrew_config') || localStorage.getItem('shootcrew_config');
     if (data) {
       const parsed = JSON.parse(data);
-      // Auto-migrate to official user UPI ID and Support Phone if old placeholder exists
       if (parsed.upiId === 'shootcrew@upi' || parsed.upiId === 'photographercrew@upi' || !parsed.supportPhone || parsed.supportPhone === '9823000000') {
         parsed.upiId = '8669173204@hdfc';
         parsed.supportPhone = '8669173204';
@@ -325,7 +505,7 @@ export const savePlatformConfig = (cfg) => {
 
 export const getBookings = () => {
   try {
-    const data = localStorage.getItem('shootcrew_bookings');
+    const data = localStorage.getItem('photographercrew_bookings') || localStorage.getItem('shootcrew_bookings');
     if (data) {
       return JSON.parse(data);
     }
@@ -370,7 +550,7 @@ export const getBookings = () => {
 
 export const saveBookings = (bookings) => {
   try {
-    localStorage.setItem('shootcrew_bookings', JSON.stringify(bookings));
+    localStorage.setItem('photographercrew_bookings', JSON.stringify(bookings));
   } catch (e) {
     console.error('Failed to save bookings', e);
   }

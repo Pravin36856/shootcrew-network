@@ -27,6 +27,7 @@ import AdminPanel from './components/AdminPanel';
 import PricingModal from './components/PricingModal';
 import DateAvailabilityViewerModal from './components/DateAvailabilityViewerModal';
 import BookingsList from './components/BookingsList';
+import GearKitModal from './components/GearKitModal';
 import { 
   getStoredCrew, 
   saveCrewData, 
@@ -49,6 +50,7 @@ export default function App() {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedRole, setSelectedRole] = useState('all');
   const [selectedGearType, setSelectedGearType] = useState('all'); // all, with_gear, without_gear
+  const [selectedSpecialGear, setSelectedSpecialGear] = useState('all'); // all, drone, gimbal, multi_cam
   const [searchQuery, setSearchQuery] = useState('');
 
   // Modals
@@ -57,6 +59,7 @@ export default function App() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
   const [viewingDatesCrew, setViewingDatesCrew] = useState(null);
+  const [viewingGearKitCrew, setViewingGearKitCrew] = useState(null);
 
   // Sync to local storage
   useEffect(() => {
@@ -100,6 +103,31 @@ export default function App() {
       return false;
     }
 
+    // Special Equipment Filter: Drone, Gimbal, Multi-Camera
+    if (selectedSpecialGear === 'drone') {
+      const hasD = crew.role === 'drone_operator' || 
+                   crew?.gearKit?.hasDrone || 
+                   (crew?.cameraDetails || '').toLowerCase().includes('drone') || 
+                   (crew?.cameraDetails || '').toLowerCase().includes('mavic');
+      if (!hasD) return false;
+    }
+
+    if (selectedSpecialGear === 'gimbal') {
+      const hasG = crew?.gearKit?.hasGimbal || 
+                   (crew?.cameraDetails || '').toLowerCase().includes('gimbal') || 
+                   (crew?.cameraDetails || '').toLowerCase().includes('rs3') ||
+                   (crew?.cameraDetails || '').toLowerCase().includes('ronin');
+      if (!hasG) return false;
+    }
+
+    if (selectedSpecialGear === 'multi_cam') {
+      const totalCams = crew?.gearKit?.totalCameras !== undefined
+        ? crew.gearKit.totalCameras
+        : (crew?.gearKit?.cameras?.reduce((acc, c) => acc + (c.qty || 1), 0) || 1);
+      const isMulti = totalCams >= 2 || (crew?.cameraDetails || '').toLowerCase().includes('2x');
+      if (!isMulti) return false;
+    }
+
     // Search query
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase();
@@ -120,6 +148,7 @@ export default function App() {
     setSelectedDate('');
     setSelectedRole('all');
     setSelectedGearType('all');
+    setSelectedSpecialGear('all');
     setSearchQuery('');
   };
 
@@ -270,6 +299,8 @@ export default function App() {
               setSelectedRole={setSelectedRole}
               selectedGearType={selectedGearType}
               setSelectedGearType={setSelectedGearType}
+              selectedSpecialGear={selectedSpecialGear}
+              setSelectedSpecialGear={setSelectedSpecialGear}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
               totalResults={filteredCrew.length}
@@ -307,6 +338,7 @@ export default function App() {
                       setPreselectedBookingDate(selectedDate);
                     }}
                     onViewDates={(c) => setViewingDatesCrew(c)}
+                    onViewGearKit={(c) => setViewingGearKitCrew(c)}
                   />
                 ))}
               </div>
@@ -434,6 +466,18 @@ export default function App() {
           onBookWithDate={(c, d) => {
             setBookingCrew(c);
             setPreselectedBookingDate(d);
+          }}
+        />
+      )}
+
+      {/* Complete Gear & Equipment Kit Modal */}
+      {viewingGearKitCrew && (
+        <GearKitModal
+          crew={viewingGearKitCrew}
+          onClose={() => setViewingGearKitCrew(null)}
+          onBook={(c) => {
+            setBookingCrew(c);
+            setPreselectedBookingDate(selectedDate);
           }}
         />
       )}
