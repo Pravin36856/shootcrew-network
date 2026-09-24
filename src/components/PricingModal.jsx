@@ -14,7 +14,7 @@ export default function PricingModal({ onClose, config, onOpenRegister }) {
             </div>
             <div>
               <h3 className="text-xl font-bold text-white">
-                ShootCrew Platform Monetization & Plans
+                PhotographerCrew Platform Monetization & Plans
               </h3>
               <p className="text-xs text-slate-400">
                 एप्लिकेशन से कमाई करने का पूरा मॉडल (How the App Owner Makes Money)

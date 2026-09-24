@@ -368,7 +368,7 @@ export default function App() {
       <footer className="bg-slate-950 border-t border-slate-900 py-8 text-center text-xs text-slate-500 space-y-2">
         <div className="flex items-center justify-center gap-2 font-bold text-slate-300">
           <Camera className="w-4 h-4 text-amber-400" />
-          <span>ShootCrew Network • Gondia - Nagpur - Bhandara - Balaghat</span>
+          <span>PhotographerCrew Network • Gondia - Nagpur - Bhandara - Balaghat</span>
         </div>
         <p>
           कैमरामैन, ड्रोन पायलट, सिनेमैटोग्राफर, रील मेकर और एलईडी वॉल हायरिंग प्लेटफॉर्म

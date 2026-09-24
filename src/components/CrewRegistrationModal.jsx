@@ -135,7 +135,7 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
       isVerified: true, // auto-verified for demonstration or pending
       registrationPaid: true,
       paymentUtr: paymentUtr,
-      instagram: instagram || '@shootcrew_member',
+      instagram: instagram || '@photographercrew_member',
       bio: bio || `${selectedRoleObj.label} available in ${selectedCityObj.name} for wedding shoots.`,
     };
 
@@ -199,7 +199,7 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                 Badhai Ho! Registration Successful 🎉
               </h4>
               <p className="text-sm text-slate-300 max-w-md mx-auto">
-                आपकी प्रोफाइल <strong>ShootCrew Network</strong> पर लाइव हो गई है। अब {selectedCityObj.name} और आसपास के सभी स्टूडियो वाले आपको खाली तारीखों पर डायरेक्ट बुक कर सकेंगे!
+                आपकी प्रोफाइल <strong>PhotographerCrew Network</strong> पर लाइव हो गई है। अब {selectedCityObj.name} और आसपास के सभी स्टूडियो वाले आपको खाली तारीखों पर डायरेक्ट बुक कर सकेंगे!
               </p>
             </div>
 

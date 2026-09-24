@@ -91,7 +91,7 @@ export default function BookingModal({ crew, preselectedDate, onClose, onBooking
 
   const handleSendWhatsApp = () => {
     const text = encodeURIComponent(
-      `*ShootCrew Direct Booking Request*\n\n` +
+      `*PhotographerCrew Direct Booking Request*\n\n` +
       `Namaste ${crew.name} ji!\n` +
       `Main ${photographerName} (${studioName || 'Studio'}) se bol raha hoon.\n` +
       `Mujhe aapko booking karni hai:\n` +

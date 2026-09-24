@@ -61,7 +61,7 @@ export default function AdminPanel({
       registrationFee: newFee,
       upiId: upiInput,
       supportPhone: supportPhoneInput,
-      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=${encodeURIComponent(upiInput)}%26pn=ShootCrew%20Platform%26am=${newFee}%26cu=INR`
+      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=${encodeURIComponent(upiInput)}%26pn=PhotographerCrew%26am=${newFee}%26cu=INR`
     };
     onSaveConfig(newConfig);
     setSaveSuccess(true);
@@ -81,7 +81,7 @@ export default function AdminPanel({
                 <ShieldCheck className="w-5 h-5" />
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-white">
-                ShootCrew Admin & Revenue Management
+                PhotographerCrew Admin & Revenue Management
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">

@@ -19,7 +19,7 @@ export default function CrewCard({ crew, onBook, onViewDates, selectedDate }) {
 
   // Format WhatsApp Link
   const waText = encodeURIComponent(
-    `Namaste ${crew.name} ji! Maine aapki profile ShootCrew application par dekhi hai. Mujhe ${selectedDate ? `Date: ${selectedDate} ke liye ` : ''}shoot ke liye ${crew.roleLabel} hire karna hai. Kya aap available hain?`
+    `Namaste ${crew.name} ji! Maine aapki profile PhotographerCrew application par dekhi hai. Mujhe ${selectedDate ? `Date: ${selectedDate} ke liye ` : ''}shoot ke liye ${crew.roleLabel} hire karna hai. Kya aap available hain?`
   );
   const waUrl = `https://wa.me/91${crew.phone}?text=${waText}`;
 
@@ -39,7 +39,7 @@ export default function CrewCard({ crew, onBook, onViewDates, selectedDate }) {
                 className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border-2 border-slate-700 group-hover:border-amber-400 transition-colors"
               />
               {crew.isVerified && (
-                <div className="absolute -bottom-1 -right-1 bg-amber-500 text-slate-950 p-1 rounded-full shadow" title="Verified ShootCrew Professional">
+                <div className="absolute -bottom-1 -right-1 bg-amber-500 text-slate-950 p-1 rounded-full shadow" title="Verified PhotographerCrew Professional">
                   <ShieldCheck className="w-3.5 h-3.5 stroke-[2.5]" />
                 </div>
               )}

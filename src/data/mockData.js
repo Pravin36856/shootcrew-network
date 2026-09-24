@@ -250,13 +250,13 @@ export const INITIAL_CREW = [
 ];
 
 export const INITIAL_PLATFORM_CONFIG = {
-  appName: 'ShootCrew Connect',
+  appName: 'PhotographerCrew Connect',
   tagline: 'Gondia & Nagpur Photography Crew & Cameraman Network',
   registrationFee: 299, // Platform fee in INR for registering
   directConnectFee: 49,  // Fee per lead or unlimited monthly
-  upiId: 'shootcrew@upi',
+  upiId: 'photographercrew@upi',
   supportPhone: '9823000000',
-  qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=shootcrew@upi%26pn=ShootCrew%20Platform%26am=299%26cu=INR',
+  qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=photographercrew@upi%26pn=PhotographerCrew%26am=299%26cu=INR',
 };
 
 // Storage helper functions
