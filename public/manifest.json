@@ -1,0 +1,24 @@
+{
+  "short_name": "PhotographerCrew",
+  "name": "PhotographerCrew - Wedding Cameraman & Crew Network",
+  "description": "Book Wedding Photographers, Drone Pilots, Cinematographers and Camera Operators across Gondia, Nagpur, Bhandara, and Balaghat.",
+  "icons": [
+    {
+      "src": "/icon-192.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#020617",
+  "theme_color": "#f59e0b",
+  "display": "standalone",
+  "orientation": "portrait"
+}

@@ -28,6 +28,7 @@ import confetti from 'canvas-confetti';
 import { 
   ROLES, 
   CITIES, 
+  SERVICES_LIST,
   COMMON_CAMERAS, 
   COMMON_GIMBALS, 
   COMMON_DRONES, 
@@ -36,9 +37,13 @@ import {
   COMMON_MICS 
 } from '../data/mockData';
 
-export default function CrewRegistrationModal({ onClose, onRegisterSuccess, config }) {
+export default function CrewRegistrationModal({ onClose, onRegisterSuccess, config, isAdminMode = false }) {
   const [step, setStep] = useState(1);
   const [copiedUpi, setCopiedUpi] = useState(false);
+  const [isAdminUnlocked, setIsAdminUnlocked] = useState(isAdminMode);
+  const [showAdminPinModal, setShowAdminPinModal] = useState(false);
+  const [adminPinInput, setAdminPinInput] = useState('');
+  const [pinError, setPinError] = useState(false);
 
   // Form State
   const [name, setName] = useState('');
@@ -47,6 +52,7 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
   const [customVillage, setCustomVillage] = useState('');
   const [area, setArea] = useState('');
   const [role, setRole] = useState('traditional_photo');
+  const [selectedSkills, setSelectedSkills] = useState(['traditional_photo', 'candid_photo']);
   const [experience, setExperience] = useState('4 Years');
   const [instagram, setInstagram] = useState('');
   const [bio, setBio] = useState('');
@@ -189,9 +195,33 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
     setAvailableDates([...availableDates, ...newDates].sort());
   };
 
-  const handleFinalSubmit = (e) => {
+  // Skill toggling helper
+  const handleToggleSkill = (skillId) => {
+    if (selectedSkills.includes(skillId)) {
+      if (selectedSkills.length > 1) {
+        setSelectedSkills(selectedSkills.filter(s => s !== skillId));
+      }
+    } else {
+      setSelectedSkills([...selectedSkills, skillId]);
+    }
+  };
+
+  // Admin PIN verification
+  const handleVerifyAdminPin = (e) => {
     e.preventDefault();
-    if (!paymentUtr) {
+    if (adminPinInput === '1234') {
+      setIsAdminUnlocked(true);
+      setShowAdminPinModal(false);
+      setPinError(false);
+      confetti({ particleCount: 60, spread: 60 });
+    } else {
+      setPinError(true);
+    }
+  };
+
+  const handleFinalSubmit = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!isAdminUnlocked && !paymentUtr) {
       alert('कृपया UPI Transaction ID / UTR नंबर दर्ज करें (Please enter UPI transaction UTR)');
       return;
     }
@@ -244,6 +274,7 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
       area: fullArea,
       role: role,
       roleLabel: selectedRoleObj.label,
+      skills: selectedSkills,
       experience: experience,
       hasCamera: hasCamera,
       gearType: hasCamera ? 'with_gear' : 'without_gear',
@@ -258,7 +289,8 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
       availableDates: availableDates,
       isVerified: true,
       registrationPaid: true,
-      paymentUtr: paymentUtr,
+      addedByAdmin: isAdminUnlocked,
+      paymentUtr: isAdminUnlocked ? (paymentUtr || 'ADMIN_FREE_ONBOARDING') : paymentUtr,
       instagram: instagram || '@photographercrew_member',
       bio: bio || `${selectedRoleObj.label} in ${selectedCityObj.name} with ${totalCameras} Camera(s)${hasGimbal ? ' + Gimbal' : ''}${hasDrone ? ' + Drone' : ''}.`,
     };
@@ -283,15 +315,22 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
         <div className="p-5 sm:p-6 border-b border-slate-800 bg-slate-950/50 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                Step {step} of 4
-              </span>
+              {isAdminUnlocked ? (
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1 shadow-sm shadow-emerald-500/10">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>👑 Admin Free Mode (0 Payment)</span>
+                </span>
+              ) : (
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  Step {step} of 4
+                </span>
+              )}
               <h3 className="text-base sm:text-xl font-bold text-white">
-                Photographer & Cameraman Registration
+                {isAdminUnlocked ? 'Admin Crew Registration (Free)' : 'Photographer & Cameraman Registration'}
               </h3>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              कैमरे, गिम्बल, ड्रोन और खाली तारीखें दर्ज करें
+              {isAdminUnlocked ? 'एडमिन मोड: बिना किसी पेमेंट के फोटोग्राफर को सीधे लिस्ट करें' : 'कैमरे, गिम्बल, ड्रोन, सर्विसेज और खाली तारीखें दर्ज करें'}
             </p>
           </div>
 
@@ -462,14 +501,51 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                       value={instagram}
                       onChange={(e) => setInstagram(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
-                    />
+                    >
+                    </input>
+                  </div>
+                </div>
+
+                {/* Services & Skills Selector (क्या-क्या काम कर सकते हैं) */}
+                <div className="pt-2 border-t border-slate-800">
+                  <label className="block text-xs font-bold text-amber-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    <span>आप क्या-क्या काम कर सकते हैं? (Services & Skills - All That Apply) *</span>
+                  </label>
+                  <p className="text-[11px] text-slate-400 mb-2.5">
+                    अपनी सभी खूबियां चुनें — ट्रेडिशनल फोटो, ट्रेडिशनल वीडियो, सिनेमैटिक, ड्रोन, प्री-वेडिंग आदि:
+                  </p>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {SERVICES_LIST.map((srv) => {
+                      const isSelected = selectedSkills.includes(srv.id);
+                      return (
+                        <button
+                          key={srv.id}
+                          type="button"
+                          onClick={() => handleToggleSkill(srv.id)}
+                          className={`p-2.5 rounded-xl border text-left transition-all flex items-center justify-between gap-1.5 cursor-pointer ${
+                            isSelected
+                              ? 'bg-amber-500/20 border-amber-500 text-white font-bold ring-1 ring-amber-500 shadow-sm shadow-amber-500/10'
+                              : 'border-slate-800 bg-slate-950/80 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                          }`}
+                        >
+                          <span className="text-xs leading-snug">{srv.label}</span>
+                          {isSelected ? (
+                            <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                          ) : (
+                            <div className="w-4 h-4 rounded-full border border-slate-700 shrink-0" />
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
                 <div className="flex justify-end pt-3">
                   <button
                     type="button"
-                    disabled={!name || !phone}
+                    disabled={!name || !phone || selectedSkills.length === 0}
                     onClick={() => setStep(2)}
                     className="flex items-center gap-2 py-3 px-6 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold text-sm shadow-md"
                   >
@@ -1038,109 +1114,244 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
             {/* STEP 4: Registration Fee & Payment */}
             {step === 4 && (
               <div className="space-y-4">
-                <div className="bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-transparent border border-amber-500/30 p-4 rounded-2xl">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
-                        Annual Crew Registration Fee
-                      </span>
-                      <h4 className="text-xl font-black text-white mt-0.5">
-                        ₹{config.registrationFee}{' '}
-                        <span className="text-xs font-normal text-slate-400">/ one-time yearly listing</span>
-                      </h4>
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold">
-                      Verified Badge Included
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-300 mt-2">
-                    इस फीस से आपको गोंदिया, नागपुर, भंडारा, बालाघाट के 200+ स्टूडियोज की डायरेक्ट बुकिंग्स मिलेंगी।
-                  </p>
-                </div>
-
-                {/* QR Code and UPI ID */}
-                <div className="bg-slate-950 border border-slate-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center gap-5">
-                  <div className="bg-white p-2.5 rounded-xl shrink-0 shadow-lg">
-                    <img
-                      src={config.qrCodeUrl}
-                      alt="UPI QR Code"
-                      className="w-32 h-32 sm:w-36 sm:h-36 object-contain"
-                    />
-                  </div>
-
-                  <div className="space-y-3 w-full text-center sm:text-left">
-                    <div>
-                      <span className="text-xs font-bold text-slate-400 block">
-                        Scan with Google Pay, PhonePe, Paytm or BHIM UPI:
-                      </span>
-                      <div className="flex items-center gap-2 mt-1 justify-center sm:justify-start">
-                        <span className="text-sm font-mono font-bold text-amber-400 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
-                          {config.upiId}
+                {isAdminUnlocked ? (
+                  /* Admin Free Mode: 0 Payment Needed */
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-transparent border-2 border-emerald-500/50 p-6 rounded-3xl space-y-4 text-center">
+                      <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 mx-auto shadow-lg shadow-emerald-500/20">
+                        <ShieldCheck className="w-9 h-9" />
+                      </div>
+                      
+                      <div>
+                        <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-black uppercase tracking-wider inline-block">
+                          👑 ADMIN MASTER POWER ACTIVE
                         </span>
-                        <button
-                          type="button"
-                          onClick={handleCopyUpi}
-                          className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs flex items-center gap-1"
-                        >
-                          {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
-                          <span>{copiedUpi ? 'Copied' : 'Copy'}</span>
-                        </button>
+                        <h4 className="text-xl font-black text-white mt-2">
+                          Direct Free Activation (बिना पेमेंट)
+                        </h4>
+                        <p className="text-xs text-slate-300 mt-1 max-w-md mx-auto">
+                          एडमिन अधिकार: इस फोटोग्राफर को जोड़ने के लिए किसी भी फीस/पेमेंट (₹0) की जरूरत नहीं है। नीचे दिए गए बटन पर क्लिक करते ही यह प्रोफाइल तुरंत वेरिफाइड और लाइव हो जाएगी।
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800 text-xs text-slate-400 max-w-sm mx-auto flex items-center justify-between">
+                        <span>Platform Fee:</span>
+                        <span className="text-slate-500 line-through">₹{config.registrationFee}</span>
+                        <span className="text-emerald-400 font-black text-sm bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">
+                          FREE (₹0)
+                        </span>
                       </div>
                     </div>
 
-                    <div className="text-[11px] text-slate-400">
-                      Amount to Pay: <strong className="text-white">₹{config.registrationFee}</strong> • Official Platform UPI
+                    <div className="flex justify-between pt-3">
+                      <button
+                        type="button"
+                        onClick={() => setStep(3)}
+                        className="flex items-center gap-1.5 py-2.5 px-4 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        <span>Back</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={isSubmitting}
+                        onClick={handleFinalSubmit}
+                        className="flex items-center gap-2 py-3.5 px-8 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 hover:from-emerald-400 text-slate-950 font-black text-sm shadow-xl shadow-emerald-500/25 cursor-pointer transform hover:scale-105 active:scale-95 transition-all"
+                      >
+                        {isSubmitting ? (
+                          <span>Activating...</span>
+                        ) : (
+                          <>
+                            <ShieldCheck className="w-5 h-5 text-slate-950" />
+                            <span>✅ बिना पेमेंट डायरेक्ट सेव और लाइव करें</span>
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  /* Normal User Payment Section */
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-transparent border border-amber-500/30 p-4 rounded-2xl">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
+                            Annual Crew Registration Fee
+                          </span>
+                          <h4 className="text-xl font-black text-white mt-0.5">
+                            ₹{config.registrationFee}{' '}
+                            <span className="text-xs font-normal text-slate-400">/ one-time yearly listing</span>
+                          </h4>
+                        </div>
+                        <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold">
+                          Verified Badge Included
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-300 mt-2">
+                        इस फीस से आपको गोंदिया, नागपुर, भंडारा, बालाघाट के 200+ स्टूडियोज की डायरेक्ट बुकिंग्स मिलेंगी।
+                      </p>
+                    </div>
 
-                {/* Transaction UTR / Ref No */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5">
-                    UPI Transaction ID / UTR Number (12 Digit) *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="उदा. 426811983021 (पेमेंट के बाद मिला UTR नंबर)"
-                    value={paymentUtr}
-                    onChange={(e) => setPaymentUtr(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 font-mono"
-                  />
-                  <p className="text-[11px] text-slate-400 mt-1">
-                    PhonePe / GPay में पेमेंट सफल होने के बाद स्क्रीन पर दिखने वाला 12-अंकों का UTR यहां डालें।
-                  </p>
-                </div>
+                    {/* QR Code and UPI ID */}
+                    <div className="bg-slate-950 border border-slate-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center gap-5">
+                      <div className="bg-white p-2.5 rounded-xl shrink-0 shadow-lg">
+                        <img
+                          src={config.qrCodeUrl}
+                          alt="UPI QR Code"
+                          className="w-32 h-32 sm:w-36 sm:h-36 object-contain"
+                        />
+                      </div>
 
-                <div className="flex justify-between pt-3">
-                  <button
-                    type="button"
-                    onClick={() => setStep(3)}
-                    className="flex items-center gap-1.5 py-2.5 px-4 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    <span>Back</span>
-                  </button>
+                      <div className="space-y-3 w-full text-center sm:text-left">
+                        <div>
+                          <span className="text-xs font-bold text-slate-400 block">
+                            Scan with Google Pay, PhonePe, Paytm or BHIM UPI:
+                          </span>
+                          <div className="flex items-center gap-2 mt-1 justify-center sm:justify-start">
+                            <span className="text-sm font-mono font-bold text-amber-400 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
+                              {config.upiId}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={handleCopyUpi}
+                              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs flex items-center gap-1 cursor-pointer"
+                            >
+                              {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+                              <span>{copiedUpi ? 'Copied' : 'Copy'}</span>
+                            </button>
+                          </div>
+                        </div>
 
-                  <button
-                    type="button"
-                    disabled={isSubmitting || !paymentUtr}
-                    onClick={handleFinalSubmit}
-                    className="flex items-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 text-slate-950 font-bold text-sm shadow-xl shadow-emerald-500/20 cursor-pointer"
-                  >
-                    {isSubmitting ? (
-                      <span>Verifying & Activating...</span>
-                    ) : (
-                      <>
-                        <ShieldCheck className="w-4 h-4 text-slate-950" />
-                        <span>Submit Registration & Get Listed</span>
-                      </>
-                    )}
-                  </button>
-                </div>
+                        <div className="text-[11px] text-slate-400">
+                          Amount to Pay: <strong className="text-white">₹{config.registrationFee}</strong> • Official Platform UPI
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Transaction UTR / Ref No */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5">
+                        UPI Transaction ID / UTR Number (12 Digit) *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="उदा. 426811983021 (पेमेंट के बाद मिला UTR नंबर)"
+                        value={paymentUtr}
+                        onChange={(e) => setPaymentUtr(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 font-mono"
+                      />
+                      <p className="text-[11px] text-slate-400 mt-1">
+                        PhonePe / GPay में पेमेंट सफल होने के बाद स्क्रीन पर दिखने वाला 12-अंकों का UTR यहां डालें।
+                      </p>
+                    </div>
+
+                    <div className="flex justify-between pt-3">
+                      <button
+                        type="button"
+                        onClick={() => setStep(3)}
+                        className="flex items-center gap-1.5 py-2.5 px-4 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        <span>Back</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={isSubmitting || !paymentUtr}
+                        onClick={handleFinalSubmit}
+                        className="flex items-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 text-slate-950 font-bold text-sm shadow-xl shadow-emerald-500/20 cursor-pointer"
+                      >
+                        {isSubmitting ? (
+                          <span>Verifying & Activating...</span>
+                        ) : (
+                          <>
+                            <ShieldCheck className="w-4 h-4 text-slate-950" />
+                            <span>Submit Registration & Get Listed</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Admin Bypass Link */}
+                    <div className="text-center pt-2 border-t border-slate-800/60">
+                      <button
+                        type="button"
+                        onClick={() => setShowAdminPinModal(true)}
+                        className="text-xs text-slate-500 hover:text-amber-400 underline transition-colors inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Are you Admin? Add without payment (एडमिन बिना पेमेंट एक्टिवेट करें)</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
+          </div>
+        )}
+
+        {/* Admin PIN Prompt Modal */}
+        {showAdminPinModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm">
+            <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl max-w-sm w-full space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between">
+                <h4 className="text-base font-bold text-white flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-amber-400" />
+                  <span>Admin PIN Verification</span>
+                </h4>
+                <button
+                  type="button"
+                  onClick={() => setShowAdminPinModal(false)}
+                  className="text-slate-400 hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <p className="text-xs text-slate-300">
+                बिना पेमेंट क्रू ऐड करने के लिए एडमिन 4-अंकों का पिन दर्ज करें (Default PIN: 1234):
+              </p>
+
+              <form onSubmit={handleVerifyAdminPin} className="space-y-3">
+                <input
+                  type="password"
+                  maxLength={6}
+                  autoFocus
+                  placeholder="Enter Admin PIN"
+                  value={adminPinInput}
+                  onChange={(e) => {
+                    setAdminPinInput(e.target.value);
+                    setPinError(false);
+                  }}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-center text-lg font-mono text-white tracking-widest focus:outline-none focus:border-amber-500"
+                />
+
+                {pinError && (
+                  <p className="text-xs text-rose-400 text-center font-semibold">
+                    गलत पिन! कृपया सही एडमिन पिन डालें (1234)।
+                  </p>
+                )}
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAdminPinModal(false)}
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold"
+                  >
+                    Verify & Unlock
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
 

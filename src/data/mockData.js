@@ -21,6 +21,19 @@ export const CITIES = [
   { id: 'chandrapur', name: 'Chandrapur (चंद्रपुर)', state: 'Maharashtra', areas: ['Gandhi Chowk', 'Civil Lines', 'Ballarpur'] },
 ];
 
+// Master list of services & skills photographers/crew can offer
+export const SERVICES_LIST = [
+  { id: 'traditional_photo', label: 'Traditional Photo (स्टिल फोटोग्राफी)', shortLabel: 'Trad Photo', icon: 'Camera' },
+  { id: 'traditional_video', label: 'Traditional Video (ट्रेडिशनल वीडियो)', shortLabel: 'Trad Video', icon: 'Video' },
+  { id: 'candid_photo', label: 'Candid Photography (कैंडिड फोटोग्राफी)', shortLabel: 'Candid Photo', icon: 'Sparkles' },
+  { id: 'cinematic_video', label: 'Cinematic Video (सिनेमैटिक वीडियो)', shortLabel: 'Cinematic', icon: 'Film' },
+  { id: 'drone_shoot', label: 'Drone Shoot (ड्रोन शूटिंग)', shortLabel: 'Drone Shoot', icon: 'Plane' },
+  { id: 'pre_wedding', label: 'Pre-Wedding Shoot (प्री-वेडिंग)', shortLabel: 'Pre-Wedding', icon: 'Heart' },
+  { id: 'reels_maker', label: 'Reel Maker (इंस्टाग्राम रील्स)', shortLabel: 'Reels', icon: 'Smartphone' },
+  { id: 'live_telecast', label: 'LED Wall / Live Setup (लाइव टेलीकास्ट)', shortLabel: 'LED / Live', icon: 'Tv' },
+  { id: 'album_editing', label: 'Album & Video Editing (एडिटिंग)', shortLabel: 'Editing', icon: 'Monitor' },
+];
+
 // Presets for Equipment Management
 export const COMMON_CAMERAS = [
   'Sony A7 IV',
@@ -121,6 +134,7 @@ export const INITIAL_CREW = [
     availableDates: ['2026-10-15', '2026-10-16', '2026-10-20', '2026-10-25', '2026-11-02', '2026-11-05', '2026-11-12', '2026-11-18', '2026-11-24', '2026-12-01', '2026-12-08'],
     isVerified: true,
     registrationPaid: true,
+    skills: ['traditional_photo', 'candid_photo', 'pre_wedding'],
     instagram: '@rohan_clicks_gondia',
     bio: 'Specialist in wedding stage photography, vidhi rituals & group posing. Sharp framing and fast turnaround.',
   },
@@ -160,6 +174,7 @@ export const INITIAL_CREW = [
     availableDates: ['2026-10-18', '2026-10-22', '2026-10-28', '2026-11-04', '2026-11-08', '2026-11-15', '2026-11-20', '2026-12-02', '2026-12-10'],
     isVerified: true,
     registrationPaid: true,
+    skills: ['drone_shoot', 'traditional_video', 'cinematic_video'],
     instagram: '@amit_drone_gondia',
     bio: 'Professional DGCA certified drone pilot. Baarat entry, outdoor pre-wedding & venue bird-eye shots.',
   },
@@ -200,6 +215,7 @@ export const INITIAL_CREW = [
     availableDates: ['2026-10-14', '2026-10-19', '2026-10-24', '2026-11-01', '2026-11-09', '2026-11-14', '2026-11-22', '2026-11-28', '2026-12-04'],
     isVerified: true,
     registrationPaid: true,
+    skills: ['cinematic_video', 'candid_photo', 'pre_wedding', 'drone_shoot'],
     instagram: '@pratik_films_ngp',
     bio: 'Cinematic teaser specialist with S-Log3 color grading experience. Smooth gimbal movements and slow motion.',
   },
@@ -235,6 +251,7 @@ export const INITIAL_CREW = [
     availableDates: ['2026-10-15', '2026-10-17', '2026-10-21', '2026-10-29', '2026-11-02', '2026-11-07', '2026-11-13', '2026-11-19', '2026-11-25', '2026-12-05'],
     isVerified: true,
     registrationPaid: true,
+    skills: ['traditional_video', 'traditional_photo'],
     instagram: '@sachin_videography',
     bio: 'Punctual & dedicated cameraman. Full rituals knowledge (Haldi, Barat, Mangalsutra, Pheras) with zero camera shake.',
   },
@@ -273,6 +290,7 @@ export const INITIAL_CREW = [
     availableDates: ['2026-10-16', '2026-10-20', '2026-10-26', '2026-11-03', '2026-11-11', '2026-11-16', '2026-11-23', '2026-11-30', '2026-12-07'],
     isVerified: true,
     registrationPaid: true,
+    skills: ['reels_maker', 'cinematic_video', 'candid_photo'],
     instagram: '@kunal_weddingreels',
     bio: 'Same-day trending wedding reels delivery! 4-5 high quality viral format reels delivered during wedding evening.',
   },
@@ -311,6 +329,7 @@ export const INITIAL_CREW = [
     availableDates: ['2026-10-18', '2026-10-25', '2026-11-05', '2026-11-12', '2026-11-18', '2026-11-26', '2026-12-02'],
     isVerified: true,
     registrationPaid: true,
+    skills: ['live_telecast', 'traditional_video'],
     instagram: '@mahesh_led_solutions',
     bio: 'Flawless live telecast with zero lag. Experienced with Blackmagic Atem Mini, multi-cam live switching & LED playback.',
   },
@@ -346,6 +365,7 @@ export const INITIAL_CREW = [
     availableDates: ['2026-10-15', '2026-10-21', '2026-10-27', '2026-11-04', '2026-11-10', '2026-11-17', '2026-11-24', '2026-12-03'],
     isVerified: true,
     registrationPaid: true,
+    skills: ['traditional_photo', 'candid_photo'],
     instagram: '@deepak_clicks_bhandara',
     bio: 'Exposing specialist without camera. Available on short notice in Bhandara, Gondia, and Nagpur belt.',
   },
@@ -384,6 +404,7 @@ export const INITIAL_CREW = [
     availableDates: ['2026-10-16', '2026-10-23', '2026-10-30', '2026-11-06', '2026-11-15', '2026-11-21', '2026-11-27', '2026-12-06'],
     isVerified: true,
     registrationPaid: true,
+    skills: ['traditional_video', 'cinematic_video', 'traditional_photo'],
     instagram: '@vikas_video_ngp',
     bio: 'Crystal clear 4K video recording with clean audio lapel mics. Excellent lighting balance during night baarat.',
   },
@@ -421,6 +442,7 @@ export const INITIAL_CREW = [
     availableDates: ['2026-10-17', '2026-10-24', '2026-10-31', '2026-11-08', '2026-11-14', '2026-11-20', '2026-11-29', '2026-12-08'],
     isVerified: true,
     registrationPaid: true,
+    skills: ['drone_shoot', 'cinematic_video'],
     instagram: '@aniket_drone_bgt',
     bio: 'Ready to travel to Gondia, Balaghat, Seoni, and Lalbarra for wedding shoots. High wind resistance.',
   }
@@ -458,6 +480,7 @@ export const getStoredCrew = () => {
             rateWithGear: c?.rateWithGear ? Number(c.rateWithGear) : fallback.rateWithGear,
             rateWithoutGear: c?.rateWithoutGear ? Number(c.rateWithoutGear) : fallback.rateWithoutGear,
             gearKit: c?.gearKit || fallback.gearKit,
+            skills: Array.isArray(c?.skills) && c.skills.length > 0 ? c.skills : fallback.skills,
           };
         });
       }

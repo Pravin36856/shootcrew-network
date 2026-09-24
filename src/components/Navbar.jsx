@@ -1,7 +1,7 @@
 import React from 'react';
-import { Camera, Calendar, UserPlus, ShieldCheck, DollarSign, BookOpen, MapPin, Sparkles } from 'lucide-react';
+import { Camera, Calendar, UserPlus, ShieldCheck, DollarSign, BookOpen, MapPin, Sparkles, Download } from 'lucide-react';
 
-export default function Navbar({ activeTab, setActiveTab, onOpenRegister, onOpenPricing, crewCount }) {
+export default function Navbar({ activeTab, setActiveTab, onOpenRegister, onOpenPricing, onOpenInstallApp, crewCount }) {
   return (
     <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -86,6 +86,17 @@ export default function Navbar({ activeTab, setActiveTab, onOpenRegister, onOpen
 
           {/* Right Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Install / Download App Button */}
+            <button
+              onClick={onOpenInstallApp}
+              className="flex items-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl text-xs sm:text-xs font-bold text-emerald-300 bg-emerald-500/15 border border-emerald-500/35 hover:bg-emerald-500/25 transition-all shadow-sm shadow-emerald-500/15 cursor-pointer"
+              title="Download Mobile Application"
+            >
+              <Download className="w-4 h-4 text-emerald-400" />
+              <span className="hidden sm:inline">📲 ऐप डाउनलोड करें</span>
+              <span className="sm:hidden">📲 ऐप डाउनलोड</span>
+            </button>
+
             <button
               onClick={onOpenPricing}
               className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 transition-colors"
@@ -107,6 +118,13 @@ export default function Navbar({ activeTab, setActiveTab, onOpenRegister, onOpen
 
         {/* Mobile Sub-Navigation Bar */}
         <div className="flex lg:hidden overflow-x-auto py-2 gap-2 border-t border-slate-800/60 no-scrollbar">
+          <button
+            onClick={onOpenInstallApp}
+            className="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap flex items-center gap-1.5 bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 shadow-sm"
+          >
+            <Download className="w-3.5 h-3.5 text-emerald-400" /> 📲 ऐप डाउनलोड
+          </button>
+
           <button
             onClick={() => setActiveTab('explore')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 ${

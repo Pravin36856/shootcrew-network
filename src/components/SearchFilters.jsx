@@ -16,7 +16,7 @@ import {
   CheckCircle2, 
   Shield 
 } from 'lucide-react';
-import { ROLES, CITIES } from '../data/mockData';
+import { ROLES, CITIES, SERVICES_LIST } from '../data/mockData';
 
 // Map icon string to Lucide icon
 const getRoleIcon = (iconName) => {
@@ -39,6 +39,8 @@ export default function SearchFilters({
   setSelectedDate,
   selectedRole,
   setSelectedRole,
+  selectedSkill = 'all',
+  setSelectedSkill,
   selectedGearType,
   setSelectedGearType,
   selectedSpecialGear,
@@ -48,7 +50,7 @@ export default function SearchFilters({
   totalResults,
   onResetFilters
 }) {
-  const isFiltered = selectedCity !== 'all' || selectedDate !== '' || selectedRole !== 'all' || selectedGearType !== 'all' || (selectedSpecialGear && selectedSpecialGear !== 'all') || searchQuery !== '';
+  const isFiltered = selectedCity !== 'all' || selectedDate !== '' || selectedRole !== 'all' || (selectedSkill && selectedSkill !== 'all') || selectedGearType !== 'all' || (selectedSpecialGear && selectedSpecialGear !== 'all') || searchQuery !== '';
 
   return (
     <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl shadow-slate-950/50 space-y-5">
@@ -262,6 +264,56 @@ export default function SearchFilters({
             </button>
           </div>
         )}
+      </div>
+
+      {/* Row: Specific Services / Skills Filter */}
+      <div className="border-t border-slate-800/80 pt-4">
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>Select Required Work (क्या काम करवाना है?)</span>
+          </label>
+          {selectedSkill !== 'all' && (
+            <button
+              type="button"
+              onClick={() => setSelectedSkill && setSelectedSkill('all')}
+              className="text-[11px] text-amber-400 hover:underline cursor-pointer"
+            >
+              Clear Service
+            </button>
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            onClick={() => setSelectedSkill && setSelectedSkill('all')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+              selectedSkill === 'all'
+                ? 'bg-amber-500 text-slate-950 border-amber-400 font-bold shadow-sm shadow-amber-500/20'
+                : 'bg-slate-950/80 text-slate-400 border-slate-800 hover:text-white'
+            }`}
+          >
+            All Work (सभी काम)
+          </button>
+          {SERVICES_LIST.map((srv) => {
+            const isMatch = selectedSkill === srv.id;
+            return (
+              <button
+                key={srv.id}
+                type="button"
+                onClick={() => setSelectedSkill && setSelectedSkill(isMatch ? 'all' : srv.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all flex items-center gap-1 cursor-pointer ${
+                  isMatch
+                    ? 'bg-amber-500 text-slate-950 border-amber-400 font-bold shadow-md shadow-amber-500/20 ring-1 ring-amber-400'
+                    : 'bg-slate-950/80 text-slate-300 border-slate-800 hover:border-slate-700 hover:text-white'
+                }`}
+              >
+                <span>{srv.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Row 3: Role / Category Chips */}

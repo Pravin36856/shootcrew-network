@@ -16,6 +16,7 @@ import {
   Layers,
   Wrench
 } from 'lucide-react';
+import { SERVICES_LIST } from '../data/mockData';
 
 export default function CrewCard({ crew, onBook, onViewDates, onViewGearKit, selectedDate }) {
   const datesList = Array.isArray(crew?.availableDates) ? crew.availableDates : [];
@@ -92,6 +93,25 @@ export default function CrewCard({ crew, onBook, onViewDates, onViewGearKit, sel
           </div>
 
         </div>
+
+        {/* Services & Skills Badges (क्या क्या काम कर सकते हैं) */}
+        {Array.isArray(crew?.skills) && crew.skills.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+            {crew.skills.map((skId) => {
+              const srvObj = SERVICES_LIST.find(s => s.id === skId);
+              const label = srvObj ? srvObj.shortLabel : skId.replace('_', ' ');
+              return (
+                <span
+                  key={skId}
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-950 text-amber-300 border border-slate-800 flex items-center gap-1 shadow-sm"
+                >
+                  <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+                  <span>{label}</span>
+                </span>
+              );
+            })}
+          </div>
+        )}
 
         {/* Camera Gear Status Box */}
         <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3 space-y-2">

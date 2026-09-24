@@ -24,7 +24,8 @@ export default function AdminPanel({
   setCrewList, 
   bookings, 
   config, 
-  onSaveConfig 
+  onSaveConfig,
+  onOpenAddCrewFree
 }) {
   const [activeTab, setActiveTab] = useState('overview'); // overview, crew, bookings, fees
   const [feeInput, setFeeInput] = useState(config.registrationFee.toString());
@@ -89,40 +90,52 @@ export default function AdminPanel({
             </p>
           </div>
 
-          {/* Quick Sub-Navigation */}
-          <div className="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
+          {/* Quick Actions & Navigation */}
+          <div className="flex flex-wrap items-center gap-2.5">
             <button
-              onClick={() => setActiveTab('overview')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                activeTab === 'overview' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
-              }`}
+              type="button"
+              onClick={onOpenAddCrewFree}
+              className="flex items-center gap-2 py-2 px-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/25 transition-transform active:scale-95 cursor-pointer"
             >
-              Overview
+              <Plus className="w-4 h-4 text-slate-950 stroke-[3]" />
+              <span>➕ नया क्रू जोड़ें (बिना पेमेंट - FREE)</span>
             </button>
-            <button
-              onClick={() => setActiveTab('crew')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                activeTab === 'crew' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              All Crew ({crewList.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('bookings')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                activeTab === 'bookings' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Bookings ({bookings.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('fees')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                activeTab === 'fees' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Fee & UPI Setup
-            </button>
+
+            {/* Quick Sub-Navigation */}
+            <div className="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  activeTab === 'overview' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => setActiveTab('crew')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  activeTab === 'crew' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                All Crew ({crewList.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('bookings')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  activeTab === 'bookings' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Bookings ({bookings.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('fees')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  activeTab === 'fees' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Fee & UPI Setup
+              </button>
+            </div>
           </div>
         </div>
 
@@ -263,6 +276,7 @@ export default function AdminPanel({
                 <tr>
                   <th className="p-3">Photographer</th>
                   <th className="p-3">Role</th>
+                  <th className="p-3">Services / काम</th>
                   <th className="p-3">City / Area</th>
                   <th className="p-3">Gear Status</th>
                   <th className="p-3">Rates</th>
@@ -295,6 +309,16 @@ export default function AdminPanel({
                     </td>
 
                     <td className="p-3">
+                      <div className="flex flex-wrap gap-1 max-w-[140px]">
+                        {(crew.skills || []).map((sk) => (
+                          <span key={sk} className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 font-medium">
+                            {sk.replace('_', ' ')}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+
+                    <td className="p-3">
                       <span className="text-slate-200">{crew.cityName}</span>
                       <span className="block text-[10px] text-slate-400">{crew.area}</span>
                     </td>
@@ -319,9 +343,15 @@ export default function AdminPanel({
                     </td>
 
                     <td className="p-3">
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
-                        ₹{config.registrationFee} Paid
-                      </span>
+                      {crew.addedByAdmin ? (
+                        <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[10px] font-bold">
+                          👑 Admin Free
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
+                          ₹{config.registrationFee} Paid
+                        </span>
+                      )}
                     </td>
 
                     <td className="p-3">

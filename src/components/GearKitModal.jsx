@@ -15,6 +15,7 @@ import {
   Sparkles,
   Plane
 } from 'lucide-react';
+import { SERVICES_LIST } from '../data/mockData';
 
 export default function GearKitModal({ crew, onClose, onBook }) {
   if (!crew) return null;
@@ -88,6 +89,31 @@ export default function GearKitModal({ crew, onClose, onBook }) {
               </span>
             </div>
           </div>
+
+          {/* Section: Services & Work Offered (क्या-क्या काम कर सकते हैं) */}
+          {Array.isArray(crew?.skills) && crew.skills.length > 0 && (
+            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2.5">
+              <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>Services & Work Offered (क्या-क्या काम कर सकते हैं)</span>
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {crew.skills.map((skId) => {
+                  const srvObj = SERVICES_LIST.find(s => s.id === skId);
+                  const label = srvObj ? srvObj.label : skId.replace('_', ' ');
+                  return (
+                    <span
+                      key={skId}
+                      className="px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center gap-1.5"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span>{label}</span>
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Section 1: Camera Bodies & Quantity */}
           <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">

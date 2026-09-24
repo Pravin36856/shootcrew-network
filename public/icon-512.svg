@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="goldGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <filter id="glow512" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  
+  <!-- App Background with Rounded Corners -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad512)"/>
+  <rect x="6" y="6" width="500" height="500" rx="108" fill="none" stroke="url(#goldGrad512)" stroke-width="8" opacity="0.6"/>
+  
+  <!-- Camera Body -->
+  <g transform="translate(70, 80)">
+    <!-- Top Flash/Pentaprism bump -->
+    <path d="M 130 70 L 160 30 L 212 30 L 242 70 Z" fill="url(#goldGrad512)" />
+    <rect x="270" y="42" width="50" height="24" rx="8" fill="#ef4444" />
+    
+    <!-- Main Camera Body -->
+    <rect x="26" y="70" width="320" height="230" rx="48" fill="#1e293b" stroke="url(#goldGrad512)" stroke-width="10"/>
+    
+    <!-- Lens Outer Ring -->
+    <circle cx="186" cy="185" r="92" fill="#0f172a" stroke="url(#goldGrad512)" stroke-width="14" filter="url(#glow512)"/>
+    <!-- Lens Middle Glass -->
+    <circle cx="186" cy="185" r="64" fill="#020617" stroke="#38bdf8" stroke-width="6" opacity="0.9"/>
+    <!-- Lens Inner Aperture Element -->
+    <circle cx="186" cy="185" r="38" fill="#f59e0b" opacity="0.8"/>
+    <circle cx="172" cy="170" r="14" fill="#ffffff" opacity="0.8"/>
+    
+    <!-- Status dots -->
+    <circle cx="75" cy="115" r="14" fill="#ef4444"/>
+    <circle cx="295" cy="115" r="12" fill="#10b981"/>
+  </g>
+  
+  <!-- Brand Text -->
+  <text x="256" y="430" text-anchor="middle" fill="#f8fafc" font-family="Arial, sans-serif" font-weight="900" font-size="36" letter-spacing="2">
+    PHOTOGRAPHER <tspan fill="#f59e0b">CREW</tspan>
+  </text>
+</svg>

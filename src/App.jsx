@@ -15,7 +15,8 @@ import {
   PhoneCall, 
   CheckCircle2, 
   Filter, 
-  DollarSign 
+  DollarSign,
+  Download 
 } from 'lucide-react';
 import Navbar from './components/Navbar';
 import SearchFilters from './components/SearchFilters';
@@ -28,6 +29,7 @@ import PricingModal from './components/PricingModal';
 import DateAvailabilityViewerModal from './components/DateAvailabilityViewerModal';
 import BookingsList from './components/BookingsList';
 import GearKitModal from './components/GearKitModal';
+import InstallAppModal from './components/InstallAppModal';
 import { 
   getStoredCrew, 
   saveCrewData, 
@@ -36,7 +38,8 @@ import {
   getPlatformConfig, 
   savePlatformConfig,
   CITIES,
-  ROLES
+  ROLES,
+  SERVICES_LIST
 } from './data/mockData';
 
 export default function App() {
@@ -49,17 +52,47 @@ export default function App() {
   const [selectedCity, setSelectedCity] = useState('all');
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedRole, setSelectedRole] = useState('all');
+  const [selectedSkill, setSelectedSkill] = useState('all');
   const [selectedGearType, setSelectedGearType] = useState('all'); // all, with_gear, without_gear
   const [selectedSpecialGear, setSelectedSpecialGear] = useState('all'); // all, drone, gimbal, multi_cam
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Modals
+  // Modals & PWA State
   const [bookingCrew, setBookingCrew] = useState(null);
   const [preselectedBookingDate, setPreselectedBookingDate] = useState('');
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [isRegisterAdminMode, setIsRegisterAdminMode] = useState(false);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
   const [viewingDatesCrew, setViewingDatesCrew] = useState(null);
   const [viewingGearKitCrew, setViewingGearKitCrew] = useState(null);
+
+  // PWA App Installation
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isAppInstalled, setIsAppInstalled] = useState(false);
+  const [showInstallBanner, setShowInstallBanner] = useState(true);
+
+  // Listen for PWA install prompt
+  useEffect(() => {
+    const handleBeforeInstall = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    const handleAppInstalled = () => {
+      setIsAppInstalled(true);
+      setDeferredPrompt(null);
+      setShowInstallBanner(false);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
 
   // Sync to local storage
   useEffect(() => {
@@ -93,6 +126,14 @@ export default function App() {
     // Role filter
     if (selectedRole !== 'all' && crew.role !== selectedRole) {
       return false;
+    }
+
+    // Specific service/skill filter (Traditional Photo, Video, Cinematic, Drone, etc.)
+    if (selectedSkill !== 'all') {
+      const skills = Array.isArray(crew.skills) ? crew.skills : [];
+      if (!skills.includes(selectedSkill)) {
+        return false;
+      }
     }
 
     // Gear filter: with_gear vs without_gear
@@ -147,6 +188,7 @@ export default function App() {
     setSelectedCity('all');
     setSelectedDate('');
     setSelectedRole('all');
+    setSelectedSkill('all');
     setSelectedGearType('all');
     setSelectedSpecialGear('all');
     setSearchQuery('');
@@ -182,10 +224,43 @@ export default function App() {
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onOpenRegister={() => setIsRegisterOpen(true)}
+        onOpenRegister={() => {
+          setIsRegisterAdminMode(false);
+          setIsRegisterOpen(true);
+        }}
         onOpenPricing={() => setIsPricingOpen(true)}
+        onOpenInstallApp={() => setIsInstallModalOpen(true)}
         crewCount={crewList.length}
       />
+
+      {/* Floating Download App Banner for Mobile/Desktop */}
+      {showInstallBanner && !isAppInstalled && (
+        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-600 text-slate-950 px-4 py-2.5 shadow-xl flex items-center justify-between text-xs font-bold z-30 sticky top-16 sm:top-20">
+          <div className="flex items-center gap-2 max-w-2xl">
+            <span className="p-1 bg-slate-950 text-emerald-400 rounded-lg shrink-0">
+              <Download className="w-4 h-4" />
+            </span>
+            <span className="leading-snug">
+              📲 <strong>PhotographerCrew ऐप अपने मोबाइल में डाउनलोड करें</strong> — 1 क्लिक में सीधे होमस्क्रीन पर चलाएं!
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => setIsInstallModalOpen(true)}
+              className="px-3 py-1 bg-slate-950 text-white hover:bg-slate-900 rounded-lg text-xs font-black shadow-md cursor-pointer whitespace-nowrap"
+            >
+              डाउनलोड / Install
+            </button>
+            <button
+              onClick={() => setShowInstallBanner(false)}
+              className="text-slate-950 hover:text-white p-1 rounded transition-colors cursor-pointer text-sm font-black"
+              title="Dismiss"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
@@ -297,6 +372,8 @@ export default function App() {
               setSelectedDate={setSelectedDate}
               selectedRole={selectedRole}
               setSelectedRole={setSelectedRole}
+              selectedSkill={selectedSkill}
+              setSelectedSkill={setSelectedSkill}
               selectedGearType={selectedGearType}
               setSelectedGearType={setSelectedGearType}
               selectedSpecialGear={selectedSpecialGear}
@@ -359,8 +436,11 @@ export default function App() {
               </div>
 
               <button
-                onClick={() => setIsRegisterOpen(true)}
-                className="shrink-0 flex items-center gap-2 py-3 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 transition-transform hover:scale-105 active:scale-95"
+                onClick={() => {
+                  setIsRegisterAdminMode(false);
+                  setIsRegisterOpen(true);
+                }}
+                className="shrink-0 flex items-center gap-2 py-3 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <UserPlus className="w-5 h-5" />
                 <span>Register as Crew Now</span>
@@ -394,6 +474,10 @@ export default function App() {
             bookings={bookings}
             config={config}
             onSaveConfig={handleSaveConfig}
+            onOpenAddCrewFree={() => {
+              setIsRegisterAdminMode(true);
+              setIsRegisterOpen(true);
+            }}
           />
         )}
 
@@ -415,6 +499,10 @@ export default function App() {
           <span>•</span>
           <button onClick={() => setActiveTab('admin')} className="hover:underline">
             Admin & UPI Settings
+          </button>
+          <span>•</span>
+          <button onClick={() => setIsInstallModalOpen(true)} className="hover:text-amber-400 font-semibold text-emerald-400 transition-colors">
+            📲 ऐप डाउनलोड करें
           </button>
           <span>•</span>
           <a 
@@ -444,7 +532,11 @@ export default function App() {
       {isRegisterOpen && (
         <CrewRegistrationModal
           config={config}
-          onClose={() => setIsRegisterOpen(false)}
+          isAdminMode={isRegisterAdminMode}
+          onClose={() => {
+            setIsRegisterOpen(false);
+            setIsRegisterAdminMode(false);
+          }}
           onRegisterSuccess={handleRegisterSuccess}
         />
       )}
@@ -454,7 +546,10 @@ export default function App() {
         <PricingModal
           config={config}
           onClose={() => setIsPricingOpen(false)}
-          onOpenRegister={() => setIsRegisterOpen(true)}
+          onOpenRegister={() => {
+            setIsRegisterAdminMode(false);
+            setIsRegisterOpen(true);
+          }}
         />
       )}
 
@@ -479,6 +574,16 @@ export default function App() {
             setBookingCrew(c);
             setPreselectedBookingDate(selectedDate);
           }}
+        />
+      )}
+
+      {/* PWA / App Install Modal */}
+      {isInstallModalOpen && (
+        <InstallAppModal
+          deferredPrompt={deferredPrompt}
+          isInstalled={isAppInstalled}
+          setIsInstalled={setIsAppInstalled}
+          onClose={() => setIsInstallModalOpen(false)}
         />
       )}
 
