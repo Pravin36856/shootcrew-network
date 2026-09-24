@@ -72,15 +72,18 @@ export default function App() {
     savePlatformConfig(newConfig);
   };
 
-  // Filter logic
-  const filteredCrew = crewList.filter((crew) => {
+  // Filter logic with complete null-safety
+  const filteredCrew = (crewList || []).filter((crew) => {
+    if (!crew) return false;
+
     // City filter
     if (selectedCity !== 'all' && crew.city !== selectedCity) {
       return false;
     }
 
     // Shoot date filter (khali dates)
-    if (selectedDate && !crew.availableDates.includes(selectedDate)) {
+    const dates = Array.isArray(crew.availableDates) ? crew.availableDates : [];
+    if (selectedDate && !dates.includes(selectedDate)) {
       return false;
     }
 
@@ -100,10 +103,10 @@ export default function App() {
     // Search query
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase();
-      const matchName = crew.name.toLowerCase().includes(q);
-      const matchArea = crew.area.toLowerCase().includes(q);
-      const matchGear = crew.cameraDetails.toLowerCase().includes(q);
-      const matchRole = crew.roleLabel.toLowerCase().includes(q);
+      const matchName = (crew.name || '').toLowerCase().includes(q);
+      const matchArea = (crew.area || '').toLowerCase().includes(q);
+      const matchGear = (crew.cameraDetails || '').toLowerCase().includes(q);
+      const matchRole = (crew.roleLabel || '').toLowerCase().includes(q);
       if (!matchName && !matchArea && !matchGear && !matchRole) {
         return false;
       }

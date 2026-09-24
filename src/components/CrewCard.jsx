@@ -15,13 +15,14 @@ import {
 } from 'lucide-react';
 
 export default function CrewCard({ crew, onBook, onViewDates, selectedDate }) {
-  const isAvailableOnSelectedDate = selectedDate ? crew.availableDates.includes(selectedDate) : null;
+  const datesList = Array.isArray(crew?.availableDates) ? crew.availableDates : [];
+  const isAvailableOnSelectedDate = selectedDate ? datesList.includes(selectedDate) : null;
 
   // Format WhatsApp Link
   const waText = encodeURIComponent(
-    `Namaste ${crew.name} ji! Maine aapki profile PhotographerCrew application par dekhi hai. Mujhe ${selectedDate ? `Date: ${selectedDate} ke liye ` : ''}shoot ke liye ${crew.roleLabel} hire karna hai. Kya aap available hain?`
+    `Namaste ${crew?.name || 'Photographer'} ji! Maine aapki profile PhotographerCrew application par dekhi hai. Mujhe ${selectedDate ? `Date: ${selectedDate} ke liye ` : ''}shoot ke liye ${crew?.roleLabel || 'Shoot'} hire karna hai. Kya aap available hain?`
   );
-  const waUrl = `https://wa.me/91${crew.phone}?text=${waText}`;
+  const waUrl = `https://wa.me/91${crew?.phone || '8669173204'}?text=${waText}`;
 
   return (
     <div className="bg-slate-900 border border-slate-800 hover:border-amber-500/40 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/5 flex flex-col justify-between group">
@@ -168,13 +169,13 @@ export default function CrewCard({ crew, onBook, onViewDates, selectedDate }) {
               onClick={() => onViewDates(crew)}
               className="text-amber-400 hover:text-amber-300 font-bold text-[11px] flex items-center gap-0.5 hover:underline"
             >
-              All {crew.availableDates.length} Dates
+              All {datesList.length} Dates
               <ChevronRight className="w-3 h-3" />
             </button>
           </div>
 
           <div className="flex flex-wrap gap-1.5">
-            {crew.availableDates.slice(0, 4).map((d) => {
+            {datesList.slice(0, 4).map((d) => {
               const isMatch = selectedDate === d;
               return (
                 <span
@@ -189,12 +190,12 @@ export default function CrewCard({ crew, onBook, onViewDates, selectedDate }) {
                 </span>
               );
             })}
-            {crew.availableDates.length > 4 && (
+            {datesList.length > 4 && (
               <span
                 onClick={() => onViewDates(crew)}
                 className="text-[11px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 font-medium hover:bg-slate-700 cursor-pointer"
               >
-                +{crew.availableDates.length - 4} more
+                +{datesList.length - 4} more
               </span>
             )}
           </div>

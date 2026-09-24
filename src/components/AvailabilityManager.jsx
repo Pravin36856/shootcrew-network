@@ -14,20 +14,21 @@ import {
 import confetti from 'canvas-confetti';
 
 export default function AvailabilityManager({ crewList, onUpdateCrewDates }) {
+  const safeCrewList = Array.isArray(crewList) ? crewList : [];
   // Let user pick a crew member or enter mobile number to load
-  const [selectedCrewId, setSelectedCrewId] = useState(crewList[0]?.id || '');
-  const [currentCrew, setCurrentCrew] = useState(crewList[0] || null);
-  const [dates, setDates] = useState(crewList[0]?.availableDates || []);
+  const [selectedCrewId, setSelectedCrewId] = useState(safeCrewList[0]?.id || '');
+  const [currentCrew, setCurrentCrew] = useState(safeCrewList[0] || null);
+  const [dates, setDates] = useState(Array.isArray(safeCrewList[0]?.availableDates) ? safeCrewList[0].availableDates : []);
   const [newDate, setNewDate] = useState('');
   const [saveMessage, setSaveMessage] = useState('');
 
   // Handle changing the crew profile
   const handleSelectCrew = (id) => {
     setSelectedCrewId(id);
-    const found = crewList.find(c => c.id === id);
+    const found = safeCrewList.find(c => c?.id === id);
     if (found) {
       setCurrentCrew(found);
-      setDates([...found.availableDates]);
+      setDates([...(Array.isArray(found.availableDates) ? found.availableDates : [])]);
       setSaveMessage('');
     }
   };

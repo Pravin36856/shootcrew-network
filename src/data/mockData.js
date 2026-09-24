@@ -264,7 +264,22 @@ export const getStoredCrew = () => {
   try {
     const data = localStorage.getItem('photographercrew_crew_data') || localStorage.getItem('shootcrew_crew_data');
     if (data) {
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map((c, i) => ({
+          ...(INITIAL_CREW[i % INITIAL_CREW.length] || INITIAL_CREW[0]),
+          ...c,
+          name: c?.name || 'Photographer',
+          phone: c?.phone || '8669173204',
+          area: c?.area || 'Gondia',
+          cityName: c?.cityName || 'Gondia',
+          roleLabel: c?.roleLabel || 'Traditional Photographer',
+          cameraDetails: c?.cameraDetails || 'Standard Gear',
+          availableDates: Array.isArray(c?.availableDates) ? c.availableDates : ['2026-10-15', '2026-11-02', '2026-11-15'],
+          rateWithGear: c?.rateWithGear ? Number(c.rateWithGear) : 2500,
+          rateWithoutGear: c?.rateWithoutGear ? Number(c.rateWithoutGear) : 1200,
+        }));
+      }
     }
   } catch (e) {
     console.error('Failed to load crew data', e);
