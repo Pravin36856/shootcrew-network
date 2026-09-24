@@ -16,8 +16,10 @@ import {
   CheckCircle2, 
   Filter, 
   DollarSign,
-  Download 
+  Download,
+  Lock
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import Navbar from './components/Navbar';
 import SearchFilters from './components/SearchFilters';
 import CrewCard from './components/CrewCard';
@@ -65,6 +67,45 @@ export default function App() {
   const [isPricingOpen, setIsPricingOpen] = useState(false);
   const [viewingDatesCrew, setViewingDatesCrew] = useState(null);
   const [viewingGearKitCrew, setViewingGearKitCrew] = useState(null);
+
+  // Admin Security & Authentication State
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
+    try {
+      return sessionStorage.getItem('photographercrew_admin_auth') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [adminLoginPin, setAdminLoginPin] = useState('');
+  const [adminLoginError, setAdminLoginError] = useState(false);
+
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    const expectedPin = config?.adminPin || '1234';
+    if (adminLoginPin.trim() === expectedPin) {
+      setIsAdminLoggedIn(true);
+      try {
+        sessionStorage.setItem('photographercrew_admin_auth', 'true');
+      } catch (err) {
+        console.error(err);
+      }
+      setAdminLoginError(false);
+      setAdminLoginPin('');
+      confetti({ particleCount: 50, spread: 60 });
+    } else {
+      setAdminLoginError(true);
+    }
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdminLoggedIn(false);
+    try {
+      sessionStorage.removeItem('photographercrew_admin_auth');
+    } catch (err) {
+      console.error(err);
+    }
+    setActiveTab('explore');
+  };
 
   // PWA App Installation
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
@@ -466,19 +507,71 @@ export default function App() {
           />
         )}
 
-        {/* TAB 4: Admin Panel & Fees */}
+        {/* TAB 4: Admin Panel & Fees (PIN Protected) */}
         {activeTab === 'admin' && (
-          <AdminPanel
-            crewList={crewList}
-            setCrewList={setCrewList}
-            bookings={bookings}
-            config={config}
-            onSaveConfig={handleSaveConfig}
-            onOpenAddCrewFree={() => {
-              setIsRegisterAdminMode(true);
-              setIsRegisterOpen(true);
-            }}
-          />
+          !isAdminLoggedIn ? (
+            <div className="max-w-md mx-auto my-12 bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-2xl">
+              <div className="w-16 h-16 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+                <Lock className="w-8 h-8 text-amber-400" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold text-white">Admin Security Access</h3>
+                <p className="text-xs text-slate-400 max-w-xs mx-auto">
+                  यह सेक्शन केवल प्लेटफॉर्म ओनर (Admin) के लिए सुरक्षित है। कृपया अपना सीक्रेट एडमिन पिन दर्ज करें।
+                </p>
+              </div>
+
+              <form onSubmit={handleAdminLogin} className="space-y-4 pt-2">
+                <input
+                  type="password"
+                  maxLength={8}
+                  autoFocus
+                  placeholder="••••"
+                  value={adminLoginPin}
+                  onChange={(e) => {
+                    setAdminLoginPin(e.target.value);
+                    setAdminLoginError(false);
+                  }}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-center text-2xl font-mono text-white tracking-[0.5em] focus:outline-none focus:border-amber-500"
+                />
+
+                {adminLoginError && (
+                  <p className="text-xs text-rose-400 font-semibold">
+                    गलत पिन! केवल अधिकृत एडमिन ही लॉगिन कर सकते हैं।
+                  </p>
+                )}
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('explore')}
+                    className="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs cursor-pointer transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs shadow-xl shadow-amber-500/20 cursor-pointer transition-all"
+                  >
+                    Unlock Admin
+                  </button>
+                </div>
+              </form>
+            </div>
+          ) : (
+            <AdminPanel
+              crewList={crewList}
+              setCrewList={setCrewList}
+              bookings={bookings}
+              config={config}
+              onSaveConfig={handleSaveConfig}
+              onLogout={handleAdminLogout}
+              onOpenAddCrewFree={() => {
+                setIsRegisterAdminMode(true);
+                setIsRegisterOpen(true);
+              }}
+            />
+          )
         )}
 
       </main>

@@ -15,7 +15,8 @@ import {
   MapPin, 
   Camera,
   ExternalLink,
-  Plus
+  Plus,
+  Lock
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -25,12 +26,14 @@ export default function AdminPanel({
   bookings, 
   config, 
   onSaveConfig,
-  onOpenAddCrewFree
+  onOpenAddCrewFree,
+  onLogout
 }) {
   const [activeTab, setActiveTab] = useState('overview'); // overview, crew, bookings, fees
   const [feeInput, setFeeInput] = useState(config.registrationFee.toString());
   const [upiInput, setUpiInput] = useState(config.upiId);
   const [supportPhoneInput, setSupportPhoneInput] = useState(config.supportPhone);
+  const [adminPinInput, setAdminPinInput] = useState(config.adminPin || '1234');
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Revenue calculation: Every crew member who paid registration fee
@@ -62,6 +65,7 @@ export default function AdminPanel({
       registrationFee: newFee,
       upiId: upiInput,
       supportPhone: supportPhoneInput,
+      adminPin: adminPinInput.trim() || '1234',
       qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=${encodeURIComponent(upiInput)}%26pn=PhotographerCrew%26am=${newFee}%26cu=INR`
     };
     onSaveConfig(newConfig);
@@ -136,6 +140,18 @@ export default function AdminPanel({
                 Fee & UPI Setup
               </button>
             </div>
+
+            {onLogout && (
+              <button
+                type="button"
+                onClick={onLogout}
+                className="flex items-center gap-1.5 py-2 px-3 rounded-xl bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 text-slate-300 font-bold text-xs border border-slate-700 transition-colors cursor-pointer"
+                title="Lock Admin Panel"
+              >
+                <Lock className="w-3.5 h-3.5" />
+                <span>लॉगआउट</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -497,6 +513,30 @@ export default function AdminPanel({
                 placeholder="8669173204"
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
               />
+            </div>
+
+            <div className="pt-2 border-t border-slate-800/80">
+              <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5 flex items-center justify-between">
+                <span className="flex items-center gap-1.5 text-amber-400">
+                  <ShieldCheck className="w-4 h-4 text-amber-400" />
+                  <span>Secret Admin PIN (एडमिन सीक्रेट पिन)</span>
+                </span>
+                <span className="text-[10px] text-slate-400 font-normal lowercase tracking-normal">
+                  (केवल आपके पास रहेगा)
+                </span>
+              </label>
+              <input
+                type="text"
+                maxLength={8}
+                required
+                value={adminPinInput}
+                onChange={(e) => setAdminPinInput(e.target.value)}
+                placeholder="4-digit PIN (e.g. 1234)"
+                className="w-full bg-slate-950 border border-amber-500/40 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none font-mono tracking-widest font-bold"
+              />
+              <span className="text-[11px] text-slate-400 mt-1 block">
+                यह पिन केवल एडमिन के लिए है। किसी भी पब्लिक पेज या रजिस्ट्रेशन फॉर्म पर यह पिन नहीं दिखेगा।
+              </span>
             </div>
 
             {saveSuccess && (

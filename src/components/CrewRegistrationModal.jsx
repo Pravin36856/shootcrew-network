@@ -209,7 +209,8 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
   // Admin PIN verification
   const handleVerifyAdminPin = (e) => {
     e.preventDefault();
-    if (adminPinInput === '1234') {
+    const expectedPin = config?.adminPin || '1234';
+    if (adminPinInput.trim() === expectedPin) {
       setIsAdminUnlocked(true);
       setShowAdminPinModal(false);
       setPinError(false);
@@ -1274,15 +1275,15 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                       </button>
                     </div>
 
-                    {/* Admin Bypass Link */}
+                    {/* Discreet Admin Authorization */}
                     <div className="text-center pt-2 border-t border-slate-800/60">
                       <button
                         type="button"
                         onClick={() => setShowAdminPinModal(true)}
-                        className="text-xs text-slate-500 hover:text-amber-400 underline transition-colors inline-flex items-center gap-1 cursor-pointer"
+                        className="text-[11px] text-slate-600 hover:text-amber-400 underline transition-colors inline-flex items-center gap-1 cursor-pointer"
                       >
-                        <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Are you Admin? Add without payment (एडमिन बिना पेमेंट एक्टिवेट करें)</span>
+                        <ShieldCheck className="w-3 h-3 text-slate-500" />
+                        <span>Admin Authorization</span>
                       </button>
                     </div>
                   </div>
@@ -1312,26 +1313,26 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
               </div>
 
               <p className="text-xs text-slate-300">
-                बिना पेमेंट क्रू ऐड करने के लिए एडमिन 4-अंकों का पिन दर्ज करें (Default PIN: 1234):
+                बिना पेमेंट क्रू ऐड करने के लिए अपना सीक्रेट एडमिन पिन दर्ज करें:
               </p>
 
               <form onSubmit={handleVerifyAdminPin} className="space-y-3">
                 <input
                   type="password"
-                  maxLength={6}
+                  maxLength={8}
                   autoFocus
-                  placeholder="Enter Admin PIN"
+                  placeholder="••••"
                   value={adminPinInput}
                   onChange={(e) => {
                     setAdminPinInput(e.target.value);
                     setPinError(false);
                   }}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-center text-lg font-mono text-white tracking-widest focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-center text-xl font-mono text-white tracking-[0.4em] focus:outline-none focus:border-amber-500"
                 />
 
                 {pinError && (
                   <p className="text-xs text-rose-400 text-center font-semibold">
-                    गलत पिन! कृपया सही एडमिन पिन डालें (1234)।
+                    गलत पिन! केवल अधिकृत एडमिन ही बिना पेमेंट क्रू ऐड कर सकते हैं।
                   </p>
                 )}
 

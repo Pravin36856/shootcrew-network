@@ -455,6 +455,7 @@ export const INITIAL_PLATFORM_CONFIG = {
   directConnectFee: 49,  // Fee per lead or unlimited monthly
   upiId: '8669173204@hdfc',
   supportPhone: '8669173204',
+  adminPin: '1234',
   qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=8669173204@hdfc%26pn=PhotographerCrew%26am=299%26cu=INR',
 };
 
@@ -508,8 +509,11 @@ export const getPlatformConfig = () => {
         parsed.upiId = '8669173204@hdfc';
         parsed.supportPhone = '8669173204';
         parsed.qrCodeUrl = INITIAL_PLATFORM_CONFIG.qrCodeUrl;
-        localStorage.setItem('photographercrew_config', JSON.stringify(parsed));
       }
+      if (!parsed.adminPin) {
+        parsed.adminPin = '1234';
+      }
+      localStorage.setItem('photographercrew_config', JSON.stringify(parsed));
       return parsed;
     }
   } catch (e) {
