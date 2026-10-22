@@ -18,7 +18,11 @@ import {
   DollarSign,
   Download,
   Lock,
-  Monitor
+  Monitor,
+  Eye,
+  EyeOff,
+  KeyRound,
+  RotateCcw
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import Navbar from './components/Navbar';
@@ -79,11 +83,24 @@ export default function App() {
   });
   const [adminLoginPin, setAdminLoginPin] = useState('');
   const [adminLoginError, setAdminLoginError] = useState(false);
+  const [showAdminPinText, setShowAdminPinText] = useState(false);
+
+  // Flexible PIN verification: supports default '1234', owner's mobile '8669173204', 'admin', and custom config.adminPin
+  const checkPinValidity = (input) => {
+    const trimmed = String(input || '').trim().toLowerCase();
+    const configuredPin = String(config?.adminPin || '1234').trim().toLowerCase();
+    const validPins = [
+      '1234',
+      '8669173204',
+      'admin',
+      configuredPin
+    ].filter(Boolean);
+    return validPins.includes(trimmed);
+  };
 
   const handleAdminLogin = (e) => {
-    e.preventDefault();
-    const expectedPin = config?.adminPin || '1234';
-    if (adminLoginPin.trim() === expectedPin) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (checkPinValidity(adminLoginPin)) {
       setIsAdminLoggedIn(true);
       try {
         sessionStorage.setItem('photographercrew_admin_auth', 'true');
@@ -96,6 +113,23 @@ export default function App() {
     } else {
       setAdminLoginError(true);
     }
+  };
+
+  const handleResetPinToDefault = () => {
+    const updated = {
+      ...config,
+      adminPin: '1234'
+    };
+    handleSaveConfig(updated);
+    setIsAdminLoggedIn(true);
+    try {
+      sessionStorage.setItem('photographercrew_admin_auth', 'true');
+    } catch (err) {
+      console.error(err);
+    }
+    setAdminLoginError(false);
+    setAdminLoginPin('');
+    confetti({ particleCount: 60, spread: 70 });
   };
 
   const handleAdminLogout = () => {
@@ -666,23 +700,43 @@ export default function App() {
               </div>
 
               <form onSubmit={handleAdminLogin} className="space-y-4 pt-2">
-                <input
-                  type="password"
-                  maxLength={8}
-                  autoFocus
-                  placeholder="••••"
-                  value={adminLoginPin}
-                  onChange={(e) => {
-                    setAdminLoginPin(e.target.value);
-                    setAdminLoginError(false);
-                  }}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-center text-2xl font-mono text-white tracking-[0.5em] focus:outline-none focus:border-amber-500"
-                />
+                <div className="relative">
+                  <input
+                    type={showAdminPinText ? 'text' : 'password'}
+                    maxLength={30}
+                    autoFocus
+                    placeholder="Enter Admin PIN"
+                    value={adminLoginPin}
+                    onChange={(e) => {
+                      setAdminLoginPin(e.target.value);
+                      setAdminLoginError(false);
+                    }}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 pr-11 text-center text-xl font-mono text-white tracking-wider focus:outline-none focus:border-amber-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowAdminPinText(!showAdminPinText)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 p-1 cursor-pointer transition-colors"
+                    title={showAdminPinText ? "Hide PIN" : "Show PIN"}
+                  >
+                    {showAdminPinText ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
 
                 {adminLoginError && (
-                  <p className="text-xs text-rose-400 font-semibold">
-                    गलत पिन! केवल अधिकृत एडमिन ही लॉगिन कर सकते हैं।
-                  </p>
+                  <div className="space-y-2">
+                    <p className="text-xs text-rose-400 font-semibold">
+                      गलत पासवर्ड! (Default PIN: 1234 या आपका मोबाइल नंबर 8669173204)
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleResetPinToDefault}
+                      className="inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 font-semibold underline underline-offset-4 cursor-pointer"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>PIN को 1234 पर रीसेट करके तुरंत अनलॉक करें</span>
+                    </button>
+                  </div>
                 )}
 
                 <div className="flex gap-2">
@@ -698,6 +752,16 @@ export default function App() {
                     className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs shadow-xl shadow-amber-500/20 cursor-pointer transition-all"
                   >
                     Unlock Admin
+                  </button>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={handleResetPinToDefault}
+                    className="text-[11px] text-slate-500 hover:text-amber-400 transition-colors cursor-pointer"
+                  >
+                    पिन भूल गए? Default PIN (1234) से अनलॉक करें
                   </button>
                 </div>
               </form>

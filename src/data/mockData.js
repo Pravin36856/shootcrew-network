@@ -737,6 +737,8 @@ export const getPlatformConfig = () => {
       }
       if (!parsed.adminPin) {
         parsed.adminPin = '1234';
+      } else {
+        parsed.adminPin = String(parsed.adminPin);
       }
       localStorage.setItem('photographercrew_config', JSON.stringify(parsed));
       return parsed;

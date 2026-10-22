@@ -527,11 +527,11 @@ export default function AdminPanel({
               </label>
               <input
                 type="text"
-                maxLength={8}
+                maxLength={30}
                 required
                 value={adminPinInput}
                 onChange={(e) => setAdminPinInput(e.target.value)}
-                placeholder="4-digit PIN (e.g. 1234)"
+                placeholder="4-digit PIN (e.g. 1234 or Mobile)"
                 className="w-full bg-slate-950 border border-amber-500/40 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none font-mono tracking-widest font-bold"
               />
               <span className="text-[11px] text-slate-400 mt-1 block">
