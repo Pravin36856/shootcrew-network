@@ -85,22 +85,11 @@ export default function App() {
   const [adminLoginError, setAdminLoginError] = useState(false);
   const [showAdminPinText, setShowAdminPinText] = useState(false);
 
-  // Flexible PIN verification: supports default '1234', owner's mobile '8669173204', 'admin', and custom config.adminPin
-  const checkPinValidity = (input) => {
-    const trimmed = String(input || '').trim().toLowerCase();
-    const configuredPin = String(config?.adminPin || '1234').trim().toLowerCase();
-    const validPins = [
-      '1234',
-      '8669173204',
-      'admin',
-      configuredPin
-    ].filter(Boolean);
-    return validPins.includes(trimmed);
-  };
-
+  // Strict Secret PIN verification: only allows the exact secret PIN set by the admin
   const handleAdminLogin = (e) => {
     if (e && e.preventDefault) e.preventDefault();
-    if (checkPinValidity(adminLoginPin)) {
+    const secretPin = String(config?.adminPin || '1234').trim();
+    if (adminLoginPin.trim() === secretPin) {
       setIsAdminLoggedIn(true);
       try {
         sessionStorage.setItem('photographercrew_admin_auth', 'true');
@@ -113,23 +102,6 @@ export default function App() {
     } else {
       setAdminLoginError(true);
     }
-  };
-
-  const handleResetPinToDefault = () => {
-    const updated = {
-      ...config,
-      adminPin: '1234'
-    };
-    handleSaveConfig(updated);
-    setIsAdminLoggedIn(true);
-    try {
-      sessionStorage.setItem('photographercrew_admin_auth', 'true');
-    } catch (err) {
-      console.error(err);
-    }
-    setAdminLoginError(false);
-    setAdminLoginPin('');
-    confetti({ particleCount: 60, spread: 70 });
   };
 
   const handleAdminLogout = () => {
@@ -724,19 +696,9 @@ export default function App() {
                 </div>
 
                 {adminLoginError && (
-                  <div className="space-y-2">
-                    <p className="text-xs text-rose-400 font-semibold">
-                      गलत पासवर्ड! (Default PIN: 1234 या आपका मोबाइल नंबर 8669173204)
-                    </p>
-                    <button
-                      type="button"
-                      onClick={handleResetPinToDefault}
-                      className="inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 font-semibold underline underline-offset-4 cursor-pointer"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span>PIN को 1234 पर रीसेट करके तुरंत अनलॉक करें</span>
-                    </button>
-                  </div>
+                  <p className="text-xs text-rose-400 font-semibold">
+                    गलत पिन! केवल अधिकृत एडमिन ही लॉगिन कर सकते हैं।
+                  </p>
                 )}
 
                 <div className="flex gap-2">
@@ -752,16 +714,6 @@ export default function App() {
                     className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs shadow-xl shadow-amber-500/20 cursor-pointer transition-all"
                   >
                     Unlock Admin
-                  </button>
-                </div>
-
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={handleResetPinToDefault}
-                    className="text-[11px] text-slate-500 hover:text-amber-400 transition-colors cursor-pointer"
-                  >
-                    पिन भूल गए? Default PIN (1234) से अनलॉक करें
                   </button>
                 </div>
               </form>

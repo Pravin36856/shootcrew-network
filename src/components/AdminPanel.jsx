@@ -16,7 +16,10 @@ import {
   Camera,
   ExternalLink,
   Plus,
-  Lock
+  Lock,
+  KeyRound,
+  EyeOff,
+  AlertCircle
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -35,6 +38,15 @@ export default function AdminPanel({
   const [supportPhoneInput, setSupportPhoneInput] = useState(config.supportPhone);
   const [adminPinInput, setAdminPinInput] = useState(config.adminPin || '1234');
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Dedicated Change PIN State
+  const [currentPinInput, setCurrentPinInput] = useState('');
+  const [newPinInput, setNewPinInput] = useState('');
+  const [confirmPinInput, setConfirmPinInput] = useState('');
+  const [showCurrentPin, setShowCurrentPin] = useState(false);
+  const [showNewPin, setShowNewPin] = useState(false);
+  const [pinChangeError, setPinChangeError] = useState('');
+  const [pinChangeSuccess, setPinChangeSuccess] = useState(false);
 
   // Revenue calculation: Every crew member who paid registration fee
   const paidCrewCount = crewList.filter(c => c.registrationPaid).length;
@@ -72,6 +84,46 @@ export default function AdminPanel({
     setSaveSuccess(true);
     confetti({ particleCount: 40, spread: 60 });
     setTimeout(() => setSaveSuccess(false), 3000);
+  };
+
+  const handleChangePin = (e) => {
+    e.preventDefault();
+    setPinChangeError('');
+    setPinChangeSuccess(false);
+
+    const activePin = String(config?.adminPin || '1234').trim();
+    if (currentPinInput.trim() !== activePin) {
+      setPinChangeError('मौजूदा पिन (Current PIN) गलत है! कृपया सही पिन दर्ज करें।');
+      return;
+    }
+
+    const trimmedNew = newPinInput.trim();
+    if (!trimmedNew) {
+      setPinChangeError('नया पिन खाली नहीं हो सकता!');
+      return;
+    }
+
+    if (trimmedNew.length < 4) {
+      setPinChangeError('नया पिन कम से कम 4 अक्षरों या अंकों का होना चाहिए!');
+      return;
+    }
+
+    if (trimmedNew !== confirmPinInput.trim()) {
+      setPinChangeError('नया पिन और दोबारा दर्ज किया गया पिन मेल नहीं खा रहे हैं!');
+      return;
+    }
+
+    const newConfig = {
+      ...config,
+      adminPin: trimmedNew
+    };
+    onSaveConfig(newConfig);
+    setAdminPinInput(trimmedNew);
+    setPinChangeSuccess(true);
+    setCurrentPinInput('');
+    setNewPinInput('');
+    setConfirmPinInput('');
+    confetti({ particleCount: 60, spread: 70 });
   };
 
   return (
@@ -138,6 +190,15 @@ export default function AdminPanel({
                 }`}
               >
                 Fee & UPI Setup
+              </button>
+              <button
+                onClick={() => setActiveTab('security')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  activeTab === 'security' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+                <span>🔐 पिन बदलें</span>
               </button>
             </div>
 
@@ -552,6 +613,136 @@ export default function AdminPanel({
             >
               <Save className="w-4 h-4 text-slate-950" />
               <span>Save & Update Payment Gateway</span>
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* TAB 5: Change Admin PIN (Security) */}
+      {activeTab === 'security' && (
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-xl mx-auto shadow-2xl">
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-800">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-inner">
+              <KeyRound className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                <span>एडमिन सीक्रेट पिन बदलें</span>
+                <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                  Owner Only
+                </span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                यह पिन केवल आपके पास रहेगा। पिन बदलने के बाद पुराने पिन से लॉगिन नहीं होगा।
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleChangePin} className="space-y-5">
+            {/* Current PIN */}
+            <div>
+              <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5 flex items-center justify-between">
+                <span>Current Admin PIN (वर्तमान पिन)</span>
+                <span className="text-[10px] text-slate-400 font-normal">पहले पुराना पिन डालें</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showCurrentPin ? "text" : "password"}
+                  required
+                  maxLength={30}
+                  value={currentPinInput}
+                  onChange={(e) => {
+                    setCurrentPinInput(e.target.value);
+                    setPinChangeError('');
+                  }}
+                  placeholder="मौजूदा पिन दर्ज करें"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 pr-11 text-sm text-white focus:outline-none font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPin(!showCurrentPin)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 p-1 cursor-pointer transition-colors"
+                  title={showCurrentPin ? "Hide PIN" : "Show PIN"}
+                >
+                  {showCurrentPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* New PIN */}
+            <div>
+              <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5 flex items-center justify-between">
+                <span>New Secret PIN (नया सीक्रेट पिन)</span>
+                <span className="text-[10px] text-slate-400 font-normal">कम से कम 4 अक्षर या अंक</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showNewPin ? "text" : "password"}
+                  required
+                  maxLength={30}
+                  value={newPinInput}
+                  onChange={(e) => {
+                    setNewPinInput(e.target.value);
+                    setPinChangeError('');
+                  }}
+                  placeholder="नया गुप्त पिन (उदा. 5678 या 8669173204)"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 pr-11 text-sm text-white focus:outline-none font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPin(!showNewPin)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 p-1 cursor-pointer transition-colors"
+                  title={showNewPin ? "Hide PIN" : "Show PIN"}
+                >
+                  {showNewPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm New PIN */}
+            <div>
+              <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5 flex items-center justify-between">
+                <span>Confirm New PIN (नया पिन दोबारा पुष्टि करें)</span>
+                <span className="text-[10px] text-slate-400 font-normal">पुष्टि के लिए वही पिन डालें</span>
+              </label>
+              <input
+                type={showNewPin ? "text" : "password"}
+                required
+                maxLength={30}
+                value={confirmPinInput}
+                onChange={(e) => {
+                  setConfirmPinInput(e.target.value);
+                  setPinChangeError('');
+                }}
+                placeholder="नया पिन दोबारा दर्ज करें"
+                className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-white focus:outline-none font-mono"
+              />
+            </div>
+
+            {/* Error Message */}
+            {pinChangeError && (
+              <div className="p-3 bg-rose-950/60 border border-rose-500/40 rounded-xl text-xs text-rose-300 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                <span>{pinChangeError}</span>
+              </div>
+            )}
+
+            {/* Success Message */}
+            {pinChangeSuccess && (
+              <div className="p-3.5 bg-emerald-950/70 border border-emerald-500/50 rounded-xl text-xs text-emerald-300 flex items-center gap-2.5 shadow-lg">
+                <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                <span className="font-semibold">
+                  पिन सफलतापूर्वक बदल दिया गया है! अब केवल नए पिन से ही एडमिन खुलेगा।
+                </span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-sm shadow-xl shadow-amber-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+            >
+              <KeyRound className="w-4 h-4 text-slate-950" />
+              <span>नया पिन सेव करें (Update Secret PIN)</span>
             </button>
           </form>
         </div>

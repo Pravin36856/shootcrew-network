@@ -212,22 +212,11 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
     }
   };
 
-  // Admin PIN verification with master fallback (1234, 8669173204, admin, config.adminPin)
-  const checkAdminPin = (input) => {
-    const trimmed = String(input || '').trim().toLowerCase();
-    const configuredPin = String(config?.adminPin || '1234').trim().toLowerCase();
-    const validPins = [
-      '1234',
-      '8669173204',
-      'admin',
-      configuredPin
-    ].filter(Boolean);
-    return validPins.includes(trimmed);
-  };
-
+  // Admin PIN verification: strictly verifies against the secret admin PIN
   const handleVerifyAdminPin = (e) => {
     if (e && e.preventDefault) e.preventDefault();
-    if (checkAdminPin(adminPinInput)) {
+    const secretPin = String(config?.adminPin || '1234').trim();
+    if (adminPinInput.trim() === secretPin) {
       setIsAdminUnlocked(true);
       setShowAdminPinModal(false);
       setPinError(false);
@@ -1399,23 +1388,9 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                 </div>
 
                 {pinError && (
-                  <div className="space-y-1">
-                    <p className="text-xs text-rose-400 text-center font-semibold">
-                      गलत पिन! (Default PIN: 1234 या मोबाइल 8669173204)
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsAdminUnlocked(true);
-                        setShowAdminPinModal(false);
-                        setPinError(false);
-                        confetti({ particleCount: 50, spread: 60 });
-                      }}
-                      className="block mx-auto text-[11px] text-amber-400 hover:underline cursor-pointer"
-                    >
-                      Default PIN 1234 से तुरंत अनलॉक करें
-                    </button>
-                  </div>
+                  <p className="text-xs text-rose-400 text-center font-semibold">
+                    गलत पिन! केवल अधिकृत एडमिन ही बिना पेमेंट क्रू ऐड कर सकते हैं।
+                  </p>
                 )}
 
                 <div className="flex gap-2">
