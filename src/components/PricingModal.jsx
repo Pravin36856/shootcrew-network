@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Check, DollarSign, Shield, Zap, Sparkles, QrCode } from 'lucide-react';
+import { X, Check, DollarSign, Shield, Zap, Sparkles, QrCode, PhoneCall } from 'lucide-react';
 
 export default function PricingModal({ onClose, config, onOpenRegister }) {
   return (
@@ -66,34 +66,42 @@ export default function PricingModal({ onClose, config, onOpenRegister }) {
                 </div>
 
                 <div className="space-y-2.5 text-xs text-slate-300 pt-2 border-t border-slate-900">
-                  <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>गोंदिया व नागपुर के सभी बड़े स्टूडियोज में लिस्टिंग</span>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <span><strong>1. अपना प्रोफाइल और Portfolio दिखाएँ:</strong> कैमरा गियर, लेंस, काम और दिन के रेट का डिजिटल प्रोफाइल।</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>Free / Khali Dates Calendar फीचर</span>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <span><strong>2. दूसरे Professionals से Networking करें:</strong> गोंदिया, तुमसर, तिरोड़ा व नागपुर के साथी प्रोफेशनल्स से नेटवर्क।</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>Verified Professional Shield Badge</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>Direct WhatsApp & Call Booking</span>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <span><strong>3. Direct Contact:</strong> उपलब्ध तारीखों पर स्टूडियो व ग्राहक सीधे आपसे संपर्क कर सकें।</span>
                   </div>
                 </div>
               </div>
 
-              <button
-                onClick={() => {
-                  onClose();
-                  onOpenRegister();
-                }}
-                className="mt-6 w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-lg transition-all"
-              >
-                Register Now as Crew (रजिस्टर करें)
-              </button>
+              <div className="mt-6 space-y-2">
+                <button
+                  onClick={() => {
+                    onClose();
+                    onOpenRegister();
+                  }}
+                  className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-lg transition-all cursor-pointer"
+                >
+                  Register Now as Crew (₹{config.registrationFee})
+                </button>
+
+                <a
+                  href={`https://wa.me/91${config.supportPhone}?text=${encodeURIComponent('Namaste, mujhe PhotographerCrew par registration me help chahiye.')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition-colors"
+                >
+                  <PhoneCall className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>WhatsApp से सहायता लें</span>
+                </a>
+              </div>
             </div>
 
             {/* Card 2: Studio Pass */}

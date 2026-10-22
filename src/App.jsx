@@ -17,7 +17,8 @@ import {
   Filter, 
   DollarSign,
   Download,
-  Lock
+  Lock,
+  Monitor
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import Navbar from './components/Navbar';
@@ -317,23 +318,23 @@ export default function App() {
                 
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold tracking-wide">
                   <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Central India's #1 Wedding Photography Network</span>
+                  <span>Central India's Photography Crew Network</span>
                 </div>
 
                 <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
                   Book Cameraman & Crew in <br className="hidden sm:block" />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-amber-200">
-                    Gondia, Nagpur & Vidarbha
+                    Gondia, Tirora, Tumsar & Nagpur
                   </span>
                 </h1>
 
                 <p className="text-sm sm:text-base text-slate-300 font-normal leading-relaxed">
-                  शादी सीजन में अपने स्टूडियो के लिए तुरंत लड़का हायर करें — <strong>कैमरे के साथ (With Camera)</strong> या <strong>सिर्फ एक्सपोजिंग / ऑपरेटर (Without Camera)</strong>। खाली तारीखें चेक करें और सीधे बुक करें!
+                  शादी सीजन में अपने स्टूडियो के लिए तुरंत लड़का हायर करें — <strong>कैमरे के साथ (With Camera)</strong> या <strong>सिर्फ एक्सपोजिंग / ऑपरेटर (Without Camera)</strong>। खाली तारीखें चेक करें और सीधे संपर्क करें!
                 </p>
 
                 {/* Popular Quick City Filters */}
                 <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
-                  <span className="text-slate-400 font-semibold">Quick Select City:</span>
+                  <span className="text-slate-400 font-semibold">City Focus:</span>
                   <button
                     onClick={() => setSelectedCity('all')}
                     className={`px-3 py-1.5 rounded-lg font-bold transition-all border ${
@@ -348,21 +349,31 @@ export default function App() {
                     onClick={() => setSelectedCity('gondia')}
                     className={`px-3 py-1.5 rounded-lg font-bold transition-all border ${
                       selectedCity === 'gondia'
-                        ? 'bg-amber-500 text-slate-950 border-amber-400'
+                        ? 'bg-amber-500 text-slate-950 border-amber-400 ring-2 ring-amber-500/30'
                         : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
                     }`}
                   >
-                    📍 Gondia (गोंदिया)
+                    📍 Gondia (गोंदिया - मुख्य केंद्र)
                   </button>
                   <button
-                    onClick={() => setSelectedCity('nagpur')}
+                    onClick={() => setSelectedCity('tirora')}
                     className={`px-3 py-1.5 rounded-lg font-bold transition-all border ${
-                      selectedCity === 'nagpur'
+                      selectedCity === 'tirora'
                         ? 'bg-amber-500 text-slate-950 border-amber-400'
                         : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
                     }`}
                   >
-                    📍 Nagpur (नागपुर)
+                    📍 Tirora (तिरोड़ा)
+                  </button>
+                  <button
+                    onClick={() => setSelectedCity('tumsar')}
+                    className={`px-3 py-1.5 rounded-lg font-bold transition-all border ${
+                      selectedCity === 'tumsar'
+                        ? 'bg-amber-500 text-slate-950 border-amber-400'
+                        : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    📍 Tumsar (तुमसर)
                   </button>
                   <button
                     onClick={() => setSelectedCity('bhandara')}
@@ -375,14 +386,14 @@ export default function App() {
                     📍 Bhandara (भंडारा)
                   </button>
                   <button
-                    onClick={() => setSelectedCity('balaghat')}
+                    onClick={() => setSelectedCity('nagpur')}
                     className={`px-3 py-1.5 rounded-lg font-bold transition-all border ${
-                      selectedCity === 'balaghat'
+                      selectedCity === 'nagpur'
                         ? 'bg-amber-500 text-slate-950 border-amber-400'
                         : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
                     }`}
                   >
-                    📍 Balaghat (बालाघाट)
+                    📍 Nagpur (नागपुर)
                   </button>
                 </div>
 
@@ -390,7 +401,7 @@ export default function App() {
                 <div className="pt-2 flex flex-wrap items-center gap-4 text-xs text-slate-400">
                   <div className="flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>Drone, Cinema, Traditional, Reel & LED</span>
+                    <span>Drone, Cinema, Traditional, Reel, Edit & LED</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
@@ -402,6 +413,122 @@ export default function App() {
                   </div>
                 </div>
 
+              </div>
+            </div>
+
+            {/* Dedicated Professionals Section: Join PhotographerCrew */}
+            <div className="relative overflow-hidden rounded-3xl bg-slate-900 border-2 border-amber-500/40 p-6 sm:p-8 shadow-2xl">
+              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                <div className="space-y-3.5 max-w-3xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-bold tracking-wide">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>For Freelancers & Operators</span>
+                  </div>
+
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight">
+                    Photography Professionals —{' '}
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
+                      Join PhotographerCrew
+                    </span>
+                  </h2>
+
+                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    अगर आप गोंदिया, तिरोड़ा, तुमसर, भंडारा या नागपुर में काम करते हैं, तो हमारे नेटवर्क से जुड़ें। इसमें निम्नलिखित सभी प्रोफेशनल्स शामिल हैं:
+                  </p>
+
+                  {/* Included Professionals Chips */}
+                  <div className="flex flex-wrap gap-2 pt-0.5">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-200">
+                      <Camera className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Photographer (स्टिल / फोटो)</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-200">
+                      <Video className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Videographer (ट्रेडिशनल वीडियो)</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-200">
+                      <Plane className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Drone Pilot (ड्रोन ऑपरेटर)</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-200">
+                      <Film className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Cinematographer (सिनेमैटिक)</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-200">
+                      <Monitor className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Editor (एल्बम व वीडियो एडिटर)</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-200">
+                      <Tv className="w-3.5 h-3.5 text-amber-400" />
+                      <span>LED Operator (लाइव व वॉल)</span>
+                    </span>
+                  </div>
+
+                  {/* 3 Honest Benefits for ₹299 */}
+                  <div className="pt-3 border-t border-slate-800 space-y-2">
+                    <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
+                      ₹{config.registrationFee} वार्षिक सदस्यता के 3 वास्तविक फायदे:
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-300">
+                      <div className="flex items-start gap-2.5 bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <div>
+                          <strong className="text-white block">1. प्रोफाइल और Portfolio</strong>
+                          <span className="text-slate-400 text-[11px] leading-tight block mt-0.5">
+                            अपना कैमरा गियर, लेंस, काम और दिन का रेट पारदर्शी तरीके से दिखाएँ।
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2.5 bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <div>
+                          <strong className="text-white block">2. Professional Networking</strong>
+                          <span className="text-slate-400 text-[11px] leading-tight block mt-0.5">
+                            स्थानीय फोटो स्टूडियोज और साथी कैमरामैन से सीधे नेटवर्क बनाएँ।
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2.5 bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <div>
+                          <strong className="text-white block">3. Direct Client Contact</strong>
+                          <span className="text-slate-400 text-[11px] leading-tight block mt-0.5">
+                            उपलब्ध तारीखों पर ग्राहक और स्टूडियो सीधे आपको कॉल या WhatsApp कर सकें।
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Direct Actions & WhatsApp Help */}
+                <div className="shrink-0 flex flex-col gap-3 w-full lg:w-72">
+                  <button
+                    onClick={() => {
+                      setIsRegisterAdminMode(false);
+                      setIsRegisterOpen(true);
+                    }}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+                  >
+                    <UserPlus className="w-5 h-5 text-slate-950" />
+                    <span>Join Now (₹{config.registrationFee} / 1 Year)</span>
+                  </button>
+
+                  {/* Direct WhatsApp Joining Assistance Button */}
+                  <a
+                    href={`https://wa.me/91${config.supportPhone}?text=${encodeURIComponent('Namaste, mujhe PhotographerCrew par apna profile judwana hai. Kripya registration me help karein.')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/40 font-bold text-xs transition-colors shadow-sm cursor-pointer"
+                  >
+                    <PhoneCall className="w-4 h-4 text-emerald-400" />
+                    <span>💬 WhatsApp से सीधे जुड़ें</span>
+                  </a>
+
+                  <p className="text-[11px] text-slate-400 text-center leading-relaxed">
+                    फॉर्म भरने में कोई दिक्कत आए तो सीधे WhatsApp पर विवरण भेजें — हम स्वयं आपकी प्रोफाइल जोड़ देंगे।
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -464,28 +591,45 @@ export default function App() {
 
             {/* Bottom Join CTA Banner */}
             <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-transparent border border-amber-500/30 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="space-y-1">
+              <div className="space-y-2 max-w-2xl">
                 <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
-                  Are you a Photographer or Cameraman?
+                  Photography Professionals — Join Today
                 </span>
                 <h3 className="text-xl sm:text-2xl font-black text-white">
-                  Get Unlimited Shoot Bookings in Gondia & Nagpur!
+                  अपना प्रोफाइल बनाएँ और स्थानीय स्टूडियोज से सीधे जुड़ें
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-400">
-                  अपनी खाली तारीखें डालें और गोंदिया, नागपुर, भंडारा के स्टूडियोज से सीधे काम पाएं। सिर्फ ₹{config.registrationFee} में लिस्ट हों।
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  गोंदिया, तिरोड़ा, तुमसर, भंडारा व नागपुर के स्टूडियोज के साथ प्रोफेशनल नेटवर्किंग और सीधी बुकिंग संपर्क के लिए सिर्फ ₹{config.registrationFee} में अपना प्रोफाइल लिस्ट करें।
                 </p>
+                <div className="flex flex-wrap gap-4 text-xs text-slate-400 pt-1">
+                  <span>✔ 1. प्रोफाइल व पोर्टफोलियो दिखाएँ</span>
+                  <span>✔ 2. प्रोफेशनल नेटवर्किंग करें</span>
+                  <span>✔ 3. सीधे ग्राहक व स्टूडियो संपर्क</span>
+                </div>
               </div>
 
-              <button
-                onClick={() => {
-                  setIsRegisterAdminMode(false);
-                  setIsRegisterOpen(true);
-                }}
-                className="shrink-0 flex items-center gap-2 py-3 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
-              >
-                <UserPlus className="w-5 h-5" />
-                <span>Register as Crew Now</span>
-              </button>
+              <div className="shrink-0 flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                <button
+                  onClick={() => {
+                    setIsRegisterAdminMode(false);
+                    setIsRegisterOpen(true);
+                  }}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+                >
+                  <UserPlus className="w-5 h-5 text-slate-950" />
+                  <span>Join as Crew (₹{config.registrationFee})</span>
+                </button>
+
+                <a
+                  href={`https://wa.me/91${config.supportPhone}?text=${encodeURIComponent('Namaste, mujhe PhotographerCrew par apna profile judwana hai. Kripya registration me help karein.')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/40 font-bold text-xs transition-colors shadow-sm"
+                >
+                  <PhoneCall className="w-4 h-4 text-emerald-400" />
+                  <span>WhatsApp Help</span>
+                </a>
+              </div>
             </div>
 
           </div>

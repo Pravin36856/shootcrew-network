@@ -22,7 +22,8 @@ import {
   Layers,
   Sun,
   Mic,
-  BatteryCharging
+  BatteryCharging,
+  PhoneCall
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { 
@@ -1186,12 +1187,28 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                           </h4>
                         </div>
                         <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold">
-                          Verified Badge Included
+                          Verified Profile Listing
                         </span>
                       </div>
-                      <p className="text-xs text-slate-300 mt-2">
-                        इस फीस से आपको गोंदिया, नागपुर, भंडारा, बालाघाट के 200+ स्टूडियोज की डायरेक्ट बुकिंग्स मिलेंगी।
-                      </p>
+
+                      {/* 3 Real Benefits */}
+                      <div className="mt-3 pt-2.5 border-t border-amber-500/20 space-y-1.5 text-xs text-slate-300">
+                        <span className="font-bold text-amber-400 block text-[11px] uppercase tracking-wider">
+                          इस ₹{config.registrationFee} वार्षिक सदस्यता के 3 वास्तविक फायदे:
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <span><strong>1. प्रोफाइल व Portfolio:</strong> अपने कैमरे, लेंस, कार्य व दिन के रेट का डिजिटल प्रोफाइल।</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <span><strong>2. Professional Networking:</strong> क्षेत्र के साथी फोटोग्राफरों और स्टूडियोज से नेटवर्क।</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <span><strong>3. Direct Client Contact:</strong> उपलब्ध तारीखों पर स्टूडियो व ग्राहक सीधे आपसे संपर्क कर सकें।</span>
+                        </div>
+                      </div>
                     </div>
 
                     {/* QR Code and UPI ID */}
@@ -1246,6 +1263,31 @@ export default function CrewRegistrationModal({ onClose, onRegisterSuccess, conf
                       <p className="text-[11px] text-slate-400 mt-1">
                         PhonePe / GPay में पेमेंट सफल होने के बाद स्क्रीन पर दिखने वाला 12-अंकों का UTR यहां डालें।
                       </p>
+                    </div>
+
+                    {/* Direct WhatsApp Joining Help Box */}
+                    <div className="bg-emerald-950/40 border border-emerald-500/30 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                      <div className="flex items-center gap-2.5">
+                        <span className="p-2 bg-emerald-500/20 text-emerald-400 rounded-xl">
+                          <PhoneCall className="w-4 h-4" />
+                        </span>
+                        <div>
+                          <strong className="text-white block">रजिस्ट्रेशन या पेमेंट में कोई दिक्कत आ रही है?</strong>
+                          <span className="text-slate-400 text-[11px]">
+                            सीधे WhatsApp पर संपर्क करें — हम स्वयं आपकी प्रोफाइल जोड़ देंगे।
+                          </span>
+                        </div>
+                      </div>
+
+                      <a
+                        href={`https://wa.me/91${config.supportPhone}?text=${encodeURIComponent('Namaste, mujhe PhotographerCrew par registration me help chahiye.')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 flex items-center gap-1.5 py-2 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md transition-colors"
+                      >
+                        <PhoneCall className="w-3.5 h-3.5" />
+                        <span>WhatsApp सहायता</span>
+                      </a>
                     </div>
 
                     <div className="flex justify-between pt-3">
